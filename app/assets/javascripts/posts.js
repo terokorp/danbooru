@@ -624,6 +624,8 @@
     });
 
     $("#save-search").click(function(e) {
+      $("#save-search-dialog #saved_search_query").val($("#tags").val());
+
       if (Danbooru.meta("disable-labeled-saved-searches") === "false") {
         $("#save-search-dialog").dialog("open");
       } else {
