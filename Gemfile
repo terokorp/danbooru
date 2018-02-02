@@ -2,12 +2,11 @@ source 'https://rubygems.org/'
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-gem 'protected_attributes'
 gem "sass-rails"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
-gem "rails", "~> 4.2.0"
+gem "rails", "~> 5.1"
 gem "pg"
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -22,9 +21,9 @@ gem 'rmagick'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
-gem 'bcrypt-ruby', :require => "bcrypt"
+gem 'bcrypt', :require => "bcrypt"
 gem 'statistics2'
-gem 'capistrano', '~> 3.4.0'
+gem 'capistrano', '~> 3.10'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv'
 gem 'radix62', '~> 1.0.1'
