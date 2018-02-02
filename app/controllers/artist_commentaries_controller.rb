@@ -37,6 +37,8 @@ class ArtistCommentariesController < ApplicationController
     respond_with(@artist_commentary)
   end
 
+private
+
   def commentary_params
     params.require(:artist_commentary).except(:post_id).permit(%i[
       original_description original_title translated_description translated_title

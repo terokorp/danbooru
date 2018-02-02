@@ -10,4 +10,5 @@ class ArtistVersionsController < ApplicationController
       end
     end
   end
+
 end

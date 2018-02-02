@@ -1,13 +1,16 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 require 'rails/all'
 
 if defined?(Bundler)
   Bundler.require(:default, Rails.env)
 end
+Bundler.require(*Rails.groups)
 
 module Danbooru
   class Application < Rails::Application
-
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.1
+    
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]
