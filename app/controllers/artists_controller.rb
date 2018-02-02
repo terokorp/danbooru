@@ -6,7 +6,7 @@ class ArtistsController < ApplicationController
   before_filter :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
 
   def new
-    @artist = Artist.new_with_defaults(params)
+    @artist = Artist.new_with_defaults(artist_params)
     respond_with(@artist)
   end
 
@@ -114,6 +114,20 @@ class ArtistsController < ApplicationController
   end
 
 private
+
+  def artist_params
+    fields = %i(body notes name url_string other_names other_names_comma group_name notes)
+    
+    if CurrentUser.is_builder?
+      fields += %i(is_active)
+    end
+    
+    if CurrentUser.is_admin?
+      fields += %i(is_banned)
+    end
+
+    params.fetch(:artist, {}).permit(fields)
+  end
 
   def load_artist
     @artist = Artist.find(params[:id])
