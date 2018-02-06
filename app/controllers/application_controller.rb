@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   helper :pagination
   before_action :reset_current_user
   before_action :set_current_user
-  after_filter :reset_current_user
+  after_action :reset_current_user
   before_action :set_title
   before_action :normalize_search
   before_action :set_started_at_session
