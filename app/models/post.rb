@@ -40,9 +40,9 @@ class Post < ApplicationRecord
   after_commit :notify_pubsub
 
   belongs_to :updater, :class_name => "User"
-  belongs_to :approver, :class_name => "User"
+  belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
-  belongs_to :parent, :class_name => "Post"
+  belongs_to :parent, class_name: "Post", optional: true
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData", :dependent => :destroy
