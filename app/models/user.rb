@@ -67,7 +67,7 @@ class User < ApplicationRecord
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
-  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.email_changed? }
+  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.saved_change_to_attribute?(:email) }
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, :in => 1..100
@@ -189,7 +189,7 @@ class User < ApplicationRecord
     end
 
     def update_remote_cache
-      if name_changed?
+      if saved_change_to_attribute?(:name)
         Danbooru.config.other_server_hosts.each do |server|
           HTTParty.delete("http://#{server}/users/#{id}/cache", Danbooru.config.httparty_options)
         end
@@ -436,7 +436,7 @@ class User < ApplicationRecord
     end
 
     def create_mod_action
-      if level_changed?
+      if saved_change_to_attribute?(:level)
         ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}},:user_level)
       end
     end

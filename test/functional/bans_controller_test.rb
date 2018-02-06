@@ -16,17 +16,19 @@ class BansControllerTest < ActionController::TestCase
     end
 
     should "get the new page" do
-      get :new, {}, {:user_id => @mod.id}
+      session[:user_id] = @mod.id
+      get :new
       assert_response :success
     end
 
     should "get the edit page" do
-      get :edit, {:id => @ban.id}, {:user_id => @mod.id}
+      session[:user_id] = @mod.id
+      get :edit, params: {id: @ban.id}
       assert_response :success
     end
 
     should "get the show page" do
-      get :show, {:id => @ban.id}
+      get :show, params: {id: @ban.id}
       assert_response :success
     end
 
@@ -35,16 +37,23 @@ class BansControllerTest < ActionController::TestCase
       assert_response :success
     end
 
+    should "search" do
+      get :index, params: {search: {user_name: @user.name}}
+      assert_response :success
+    end
+
     should "create a ban" do
       assert_difference("Ban.count", 1) do
-        post :create, {:ban => {:duration => 60, :reason => "xxx", :user_id => @user.id}}, {:user_id => @mod.id}
+        session[:user_id] = @mod.id
+        post :create, params: {ban: {duration: 60, reason: "xxx", user_id: @user.id}}
       end
       ban = Ban.last
       assert_redirected_to(ban_path(ban))
     end
 
     should "update a ban" do
-      post :update, {:id => @ban.id, :ban => {:reason => "xxx", :duration => 60}}, {:user_id => @mod.id}
+      session[:user_id] = @mod.id
+      post :update, params: {id: @ban.id, ban: {reason: "xxx", duration: 60}}
       @ban.reload
       assert_equal("xxx", @ban.reason)
       assert_redirected_to(ban_path(@ban))
@@ -52,7 +61,8 @@ class BansControllerTest < ActionController::TestCase
 
     should "destroy a ban" do
       assert_difference("Ban.count", -1) do
-        post :destroy, {:id => @ban.id}, {:user_id => @mod.id}
+        session[:user_id] = @mod.id
+        post :destroy, params: {id: @ban.id}
       end
       assert_redirected_to(bans_path)
     end

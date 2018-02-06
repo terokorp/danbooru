@@ -32,17 +32,17 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           }
         }
 
-        get :index, params
+        get :index, params: params
         assert_response :success
       end
     end
 
     context "show action" do
       should "render" do
-        get :show, { id: @commentary1.id }
+        get :show, params: { id: @commentary1.id }
         assert_redirected_to(@commentary1.post)
 
-        get :show, { post_id: @commentary1.post_id }
+        get :show, params: { post_id: @commentary1.post_id }
         assert_redirected_to(@commentary1.post)
       end
     end
@@ -56,7 +56,8 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           }
         }
 
-        post :create_or_update, params, { user_id: @user.id }
+        session[:user_id] = @user.id
+        post :create_or_update, params: params
         assert_redirected_to(ArtistCommentary.find_by_post_id(params[:artist_commentary][:post_id]))
       end
 
@@ -68,7 +69,8 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           }
         }
 
-        post :create_or_update, params, { user_id: @user.id }
+        session[:user_id] = @user.id
+        post :create_or_update, params: params
         assert_redirected_to(@commentary1)
         assert_equal("foo", @commentary1.reload.original_title)
       end
@@ -79,19 +81,23 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
         original_title = @commentary1.original_title
         @commentary1.update(original_title: "foo")
 
-        post :revert, { :id => @commentary1.post_id, :version_id => @commentary1.versions(true).first.id }, {:user_id => @user.id}
+        session[:user_id] = @user.id
+        @commentary1.reload
+        post :revert, params: { :id => @commentary1.post_id, :version_id => @commentary1.versions.first.id }
         assert_redirected_to(@commentary1)
         assert_equal(original_title, @commentary1.reload.original_title)
       end
 
       should "return 404 when trying to revert a nonexistent commentary" do
-        post :revert, { :id => -1, :version_id => -1 }, {:user_id => @user.id}
+        session[:user_id] = @user.id
+        post :revert, params: { :id => -1, :version_id => -1 }
 
         assert_response 404
       end
 
       should "not allow reverting to a previous version of another artist commentary" do
-        post :revert, { :id => @commentary1.post_id, :version_id => @commentary2.versions(true).first.id }, {:user_id => @user.id}
+        session[:user_id] = @user.id
+        post :revert, params: { :id => @commentary1.post_id, :version_id => @commentary2.versions.first.id }
         @commentary1.reload
 
         assert_not_equal(@commentary1.original_title, @commentary2.original_title)

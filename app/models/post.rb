@@ -29,7 +29,7 @@ class Post < ApplicationRecord
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
-  after_save :queue_backup, if: :md5_changed?
+  after_save :queue_backup, if: lambda {|rec| rec.saved_change_to_attribute(:md5)}
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
@@ -39,7 +39,7 @@ class Post < ApplicationRecord
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
-  belongs_to :updater, :class_name => "User"
+  belongs_to :updater, :class_name => "User", optional: true # this is handled in versions
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
@@ -1256,7 +1256,7 @@ class Post < ApplicationRecord
 
     def fix_post_counts(post)
       post.set_tag_counts(false)
-      if post.changed?
+      if post.changes_saved?
         args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
         post.update_columns(args)
       end
@@ -1333,7 +1333,7 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_save
-      return unless parent_id_changed? || is_deleted_changed?
+      return unless saved_change_to_attribute?(:parent_id) || saved_change_to_attribute?(:is_deleted)
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
@@ -1466,7 +1466,7 @@ class Post < ApplicationRecord
 
   module VersionMethods
     def create_version(force = false)
-      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
+      if new_record? || saved_change_to_attribute?(:rating) || saved_change_to_attribute?(:source) || saved_change_to_attribute?(:parent_id) || saved_change_to_attribute?(:tag_string) || force
         create_new_version
       end
     end
@@ -1738,9 +1738,9 @@ class Post < ApplicationRecord
     end
 
     def updater_can_change_rating
-      if rating_changed? && is_rating_locked?
+      if saved_change_to_attribute?(:rating) && is_rating_locked?
         # Don't forbid changes if the rating lock was just now set in the same update.
-        if !is_rating_locked_changed?
+        if !saved_change_to_attribute?(:is_rating_locked)
           errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
         end
       end

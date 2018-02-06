@@ -1,6 +1,7 @@
 class BansController < ApplicationController
   before_action :moderator_only, :except => [:show, :index]
   respond_to :html, :xml, :json
+  helper_method :search_params
 
   def new
     @ban = Ban.new(params[:ban])
@@ -48,6 +49,10 @@ class BansController < ApplicationController
   end
 
   private
+
+  def search_params
+    params.fetch(:search, {}).permit(%i(user_name banner_name reason_matches expired order commit))
+  end
 
   def ban_params(context)
     permitted_params = %i[reason duration expires_at]

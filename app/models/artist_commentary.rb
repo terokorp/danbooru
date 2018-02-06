@@ -108,12 +108,12 @@ class ArtistCommentary < ApplicationRecord
       post.add_tag("check_commentary")
     end
 
-    post.save if post.tag_string_changed?
+    post.save if post.saved_change_to_attribute?(:tag_string)
   end
 
   module VersionMethods
     def create_version
-      return unless changed?
+      return unless saved_changes?
 
       if merge_version?
         merge_version
