@@ -3,7 +3,7 @@ require 'test_helper'
 class TagImplicationsControllerTest < ActionController::TestCase
   context "The tag implications controller" do
     setup do
-      @user = FactoryGirl.create(:admin_user)
+      @user = FactoryBot.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -16,7 +16,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
 
     context "edit action" do
       setup do
-        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
       should "render" do
@@ -27,7 +27,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
       context "for a pending implication" do
@@ -67,7 +67,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
     context "index action" do
       setup do
         CurrentUser.scoped(@user, "127.0.0.1") do
-          @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+          @tag_implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
         end
       end
 
@@ -85,7 +85,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
     context "destroy action" do
       setup do
         CurrentUser.scoped(@user, "127.0.0.1") do
-          @tag_implication = FactoryGirl.create(:tag_implication)
+          @tag_implication = FactoryBot.create(:tag_implication)
         end
       end
 

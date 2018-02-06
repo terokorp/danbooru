@@ -3,7 +3,7 @@ require 'test_helper'
 class TagAliasesControllerTest < ActionController::TestCase
   context "The tag aliases controller" do
     setup do
-      @user = FactoryGirl.create(:admin_user)
+      @user = FactoryBot.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "edit action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
       should "render" do
@@ -26,7 +26,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
       context "for a pending alias" do
@@ -65,7 +65,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
       should "list all tag alias" do
@@ -81,7 +81,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias)
+        @tag_alias = FactoryBot.create(:tag_alias)
       end
 
       should "destroy a tag_alias" do

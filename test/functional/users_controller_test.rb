@@ -3,7 +3,7 @@ require 'test_helper'
 class UsersControllerTest < ActionController::TestCase
   context "The users controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -37,9 +37,9 @@ class UsersControllerTest < ActionController::TestCase
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = FactoryGirl.create(:banned_user, can_approve_posts: true, is_super_voter: true)
-        FactoryGirl.create(:saved_search, user: @user)
-        FactoryGirl.create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
+        @user = FactoryBot.create(:banned_user, can_approve_posts: true, is_super_voter: true)
+        FactoryBot.create(:saved_search, user: @user)
+        FactoryBot.create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
       end
 
       should "render" do
@@ -56,7 +56,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "not show hidden attributes to others" do
-        another = FactoryGirl.create(:user)
+        another = FactoryBot.create(:user)
 
         get :show, {id: another.id, format: :json}, {user_id: @user.id}
         json = JSON.parse(response.body)
@@ -113,7 +113,7 @@ class UsersControllerTest < ActionController::TestCase
 
     context "edit action" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
       end
 
       should "render" do
@@ -124,7 +124,7 @@ class UsersControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
       end
 
       should "update a user" do
@@ -135,7 +135,7 @@ class UsersControllerTest < ActionController::TestCase
 
       context "changing the level" do
         setup do
-          @cuser = FactoryGirl.create(:user)
+          @cuser = FactoryBot.create(:user)
         end
 
         should "not work" do
@@ -147,7 +147,7 @@ class UsersControllerTest < ActionController::TestCase
 
       context "for a banned user" do
         should "allow the user to edit their settings" do
-          @user = FactoryGirl.create(:banned_user)
+          @user = FactoryBot.create(:banned_user)
           post :update, {:id => @user.id, :user => {:favorite_tags => "xyz"}}, {:user_id => @user.id}
 
           assert_equal("xyz", @user.reload.favorite_tags)

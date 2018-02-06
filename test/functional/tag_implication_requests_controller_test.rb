@@ -4,7 +4,7 @@ class TagImplicationRequestsControllerTest < ActionController::TestCase
   context "The tag implication request controller" do
     setup do
       Timecop.travel(1.month.ago) do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"

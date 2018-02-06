@@ -3,7 +3,7 @@ require 'test_helper'
 class SessionsControllerTest < ActionController::TestCase
   context "the sessions controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
     end
 
     context "new action" do
@@ -24,7 +24,7 @@ class SessionsControllerTest < ActionController::TestCase
 
       should "unban user if user has expired ban" do
         CurrentUser.scoped(@user, "127.0.0.1") do
-          @banned = FactoryGirl.create(:banned_user, ban_duration: 3)
+          @banned = FactoryBot.create(:banned_user, ban_duration: 3)
         end
 
         travel_to(4.days.from_now) do

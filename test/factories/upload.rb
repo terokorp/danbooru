@@ -1,6 +1,6 @@
 require 'fileutils'
 
-FactoryGirl.define do
+FactoryBot.define do
   factory(:upload) do
     rating "s"
     uploader :factory => :user, :level => 20

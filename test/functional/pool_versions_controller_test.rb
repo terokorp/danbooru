@@ -5,7 +5,7 @@ class PoolVersionsControllerTest < ActionController::TestCase
     setup do
       mock_pool_archive_service!
       start_pool_archive_transaction
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -18,9 +18,9 @@ class PoolVersionsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
-        @user_2 = FactoryGirl.create(:user)
-        @user_3 = FactoryGirl.create(:user)
+        @pool = FactoryBot.create(:pool)
+        @user_2 = FactoryBot.create(:user)
+        @user_3 = FactoryBot.create(:user)
 
         CurrentUser.scoped(@user_2, "1.2.3.4") do
           @pool.update_attributes(:post_ids => "1 2")

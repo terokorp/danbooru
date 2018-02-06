@@ -8,7 +8,7 @@ class UploadsControllerTest < ActionController::TestCase
 
   context "The uploads controller" do
     setup do
-      @user = FactoryGirl.create(:contributor_user)
+      @user = FactoryBot.create(:contributor_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -53,7 +53,7 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "for a post that has already been uploaded" do
         setup do
-          @post = FactoryGirl.create(:post, :source => "aaa")
+          @post = FactoryBot.create(:post, :source => "aaa")
         end
 
         should "initialize the post" do
@@ -66,7 +66,7 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @upload = FactoryGirl.create(:source_upload)
+        @upload = FactoryBot.create(:source_upload)
       end
 
       should "render" do
@@ -84,7 +84,7 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "show action" do
       setup do
-        @upload = FactoryGirl.create(:jpg_upload)
+        @upload = FactoryBot.create(:jpg_upload)
       end
 
       should "render" do
@@ -105,7 +105,7 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @upload = FactoryGirl.create(:jpg_upload)
+        @upload = FactoryBot.create(:jpg_upload)
       end
 
       should "process an unapproval" do

@@ -4,12 +4,12 @@ class ReportsControllerTest < ActionController::TestCase
   def setup
     super
 
-    CurrentUser.user = FactoryGirl.create(:mod_user)
+    CurrentUser.user = FactoryBot.create(:mod_user)
     CurrentUser.ip_addr = "127.0.0.1"
     session[:user_id] = CurrentUser.user.id
 
-    @users = FactoryGirl.create_list(:contributor_user, 2)
-    @posts = @users.map { |u| FactoryGirl.create(:post, uploader: u) }
+    @users = FactoryBot.create_list(:contributor_user, 2)
+    @posts = @users.map { |u| FactoryBot.create(:post, uploader: u) }
   end
 
   def teardown

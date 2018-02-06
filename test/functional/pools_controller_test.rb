@@ -4,12 +4,12 @@ class PoolsControllerTest < ActionController::TestCase
   context "The pools controller" do
     setup do
       Timecop.travel(1.month.ago) do
-        @user = FactoryGirl.create(:user)
-        @mod = FactoryGirl.create(:moderator_user)
+        @user = FactoryBot.create(:user)
+        @mod = FactoryBot.create(:moderator_user)
       end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = FactoryGirl.create(:post)
+      @post = FactoryBot.create(:post)
       mock_pool_archive_service!
       PoolArchive.sqs_service.stubs(:merge?).returns(false)
       start_pool_archive_transaction
@@ -22,7 +22,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        FactoryGirl.create(:pool, :name => "abc")
+        FactoryBot.create(:pool, :name => "abc")
       end
 
       should "list all pools" do
@@ -38,7 +38,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "show action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
+        @pool = FactoryBot.create(:pool)
       end
 
       should "render" do
@@ -49,7 +49,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "gallery action" do
       should "render" do
-        pool = FactoryGirl.create(:pool)
+        pool = FactoryBot.create(:pool)
         get :gallery, {:id => pool.id}
         assert_response :success
       end
@@ -72,7 +72,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "edit action" do
       should "render" do
-        pool = FactoryGirl.create(:pool)
+        pool = FactoryBot.create(:pool)
 
         get :edit, { id: pool.id }, { user_id: @user.id }
         assert_response :success
@@ -81,7 +81,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
+        @pool = FactoryBot.create(:pool)
       end
 
       should "update a pool" do
@@ -100,7 +100,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
+        @pool = FactoryBot.create(:pool)
       end
 
       should "destroy a pool" do
@@ -112,7 +112,7 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "undelete action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
+        @pool = FactoryBot.create(:pool)
         @pool.is_deleted = true
         @pool.save
       end
@@ -126,8 +126,8 @@ class PoolsControllerTest < ActionController::TestCase
 
     context "revert action" do
       setup do
-        @post_2 = FactoryGirl.create(:post)
-        @pool = FactoryGirl.create(:pool, :post_ids => "#{@post.id}")
+        @post_2 = FactoryBot.create(:post)
+        @pool = FactoryBot.create(:pool, :post_ids => "#{@post.id}")
         CurrentUser.ip_addr = "1.2.3.4" # this is to get around the version collation
         @pool.update_attributes(:post_ids => "#{@post.id} #{@post_2.id}")
         CurrentUser.ip_addr = "127.0.0.1"
@@ -143,7 +143,7 @@ class PoolsControllerTest < ActionController::TestCase
       end
 
       should "not allow reverting to a previous version of another pool" do
-        @pool2 = FactoryGirl.create(:pool)
+        @pool2 = FactoryBot.create(:pool)
 
         post :revert, { :id => @pool.id, :version_id => @pool2.versions.first.id }, {:user_id => @user.id}
         @pool.reload

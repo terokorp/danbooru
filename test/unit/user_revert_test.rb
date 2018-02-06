@@ -3,14 +3,14 @@ require 'test_helper'
 class UserRevertTest < ActiveSupport::TestCase
   context "Reverting a user's changes" do
     setup do
-      @creator = FactoryGirl.create(:user)
-      @user = FactoryGirl.create(:user)
+      @creator = FactoryBot.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
       CurrentUser.scoped(@creator) do
-        @parent = FactoryGirl.create(:post)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @parent = FactoryBot.create(:post)
+        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
       end
 
       @post.stubs(:merge_version?).returns(false)

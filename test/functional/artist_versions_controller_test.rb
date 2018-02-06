@@ -3,9 +3,9 @@ require 'test_helper'
 class ArtistVersionsControllerTest < ActionController::TestCase
   context "An artist versions controller" do
     setup do
-      CurrentUser.user = FactoryGirl.create(:gold_user)
+      CurrentUser.user = FactoryBot.create(:gold_user)
       CurrentUser.ip_addr = "127.0.0.1"
-      @artist = FactoryGirl.create(:artist)
+      @artist = FactoryBot.create(:artist)
     end
 
     teardown do

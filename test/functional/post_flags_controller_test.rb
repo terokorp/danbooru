@@ -4,7 +4,7 @@ class PostFlagsControllerTest < ActionController::TestCase
   context "The post flags controller" do
     setup do
       Timecop.travel(2.weeks.ago) do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
@@ -24,8 +24,8 @@ class PostFlagsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @post_flag = FactoryGirl.create(:post_flag, :post => @post)
+        @post = FactoryBot.create(:post)
+        @post_flag = FactoryBot.create(:post_flag, :post => @post)
       end
 
       should "render" do
@@ -43,7 +43,7 @@ class PostFlagsControllerTest < ActionController::TestCase
 
     context "create action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @post = FactoryBot.create(:post)
       end
 
       should "create a new flag" do

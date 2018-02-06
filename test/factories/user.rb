@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
     name {(rand(1_000_000) + 10).to_s}
     password "password"

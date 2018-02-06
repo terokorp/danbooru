@@ -7,7 +7,7 @@ gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
 gem "rails", "~> 5.1"
-gem "pg"
+gem "pg", "~> 0.21.0" # bug in rails, fixed in https://github.com/rails/rails/issues/31673
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "tzinfo-data", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -66,16 +66,16 @@ group :development, :test do
   gem 'awesome_print'
   gem 'pry-byebug'
   gem 'ruby-prof'
+  gem 'listen'
 end
 
 group :test do
   gem "shoulda-context"
   gem "shoulda-matchers"
-  gem "factory_girl"
+  gem "factory_bot_rails"
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
   gem "timecop"
   gem "webmock"
-  gem "test_after_commit" # XXX remove me after upgrading to rails 5.
 end

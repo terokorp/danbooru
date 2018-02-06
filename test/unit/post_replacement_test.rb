@@ -16,11 +16,11 @@ class PostReplacementTest < ActiveSupport::TestCase
     mock_iqdb_service!
     Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
-    @system = FactoryGirl.create(:user, created_at: 2.weeks.ago)
+    @system = FactoryBot.create(:user, created_at: 2.weeks.ago)
     User.stubs(:system).returns(@system)
 
-    @uploader = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
-    @replacer = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
+    @uploader = FactoryBot.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
+    @replacer = FactoryBot.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
     CurrentUser.user = @replacer
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -36,7 +36,7 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "Replacing" do
     setup do
       CurrentUser.scoped(@uploader, "127.0.0.2") do
-        upload = FactoryGirl.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
+        upload = FactoryBot.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
         upload.process!
         @post = upload.post
       end
@@ -217,8 +217,8 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "two posts that have had their files swapped" do
       should "not delete the still active files" do
-        @post1 = FactoryGirl.create(:post)
-        @post2 = FactoryGirl.create(:post)
+        @post1 = FactoryBot.create(:post)
+        @post2 = FactoryBot.create(:post)
 
         # swap the images between @post1 and @post2.
         @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")

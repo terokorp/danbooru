@@ -3,11 +3,11 @@ require 'test_helper'
 class IqdbQueriesControllerTest < ActionController::TestCase
   context "The iqdb controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @posts = FactoryGirl.create_list(:post, 2)
+      @posts = FactoryBot.create_list(:post, 2)
       mock_iqdb_service!
     end
 

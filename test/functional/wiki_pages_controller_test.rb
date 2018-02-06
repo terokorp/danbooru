@@ -3,8 +3,8 @@ require 'test_helper'
 class WikiPagesControllerTest < ActionController::TestCase
   context "The wiki pages controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @mod = FactoryGirl.create(:moderator_user)
+      @user = FactoryBot.create(:user)
+      @mod = FactoryBot.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,8 +15,8 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @wiki_page_abc = FactoryGirl.create(:wiki_page, :title => "abc")
-        @wiki_page_def = FactoryGirl.create(:wiki_page, :title => "def")
+        @wiki_page_abc = FactoryBot.create(:wiki_page, :title => "abc")
+        @wiki_page_def = FactoryBot.create(:wiki_page, :title => "def")
       end
 
       should "list all wiki_pages" do
@@ -37,7 +37,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "show action" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page)
+        @wiki_page = FactoryBot.create(:wiki_page)
       end
 
       should "render" do
@@ -64,7 +64,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "show_or_new action" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page)
+        @wiki_page = FactoryBot.create(:wiki_page)
       end
 
       should "redirect when given a title" do
@@ -87,7 +87,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "edit action" do
       should "render" do
-        wiki_page = FactoryGirl.create(:wiki_page)
+        wiki_page = FactoryBot.create(:wiki_page)
 
         get :edit, { id: wiki_page.id }, { user_id: @mod.id }
         assert_response :success
@@ -104,8 +104,8 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @tag = FactoryGirl.create(:tag, name: "foo", post_count: 42)
-        @wiki_page = FactoryGirl.create(:wiki_page, title: "foo")
+        @tag = FactoryBot.create(:tag, name: "foo", post_count: 42)
+        @wiki_page = FactoryBot.create(:wiki_page, title: "foo")
       end
 
       should "update a wiki_page" do
@@ -134,8 +134,8 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page)
-        @mod = FactoryGirl.create(:mod_user)
+        @wiki_page = FactoryBot.create(:wiki_page)
+        @mod = FactoryBot.create(:mod_user)
       end
 
       should "destroy a wiki_page" do
@@ -157,7 +157,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "revert action" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page, :body => "1")
+        @wiki_page = FactoryBot.create(:wiki_page, :body => "1")
         Timecop.travel(1.day.from_now) do
           @wiki_page.update_attributes(:body => "1 2")
         end
@@ -175,7 +175,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       end
 
       should "not allow reverting to a previous version of another wiki page" do
-        @wiki_page_2 = FactoryGirl.create(:wiki_page)
+        @wiki_page_2 = FactoryBot.create(:wiki_page)
 
         post :revert, { :id => @wiki_page.id, :version_id => @wiki_page_2.versions(true).first.id }, {:user_id => @user.id}
         @wiki_page.reload

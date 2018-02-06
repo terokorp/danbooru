@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:artist_commentary) do
     post :factory => :post
     original_title { FFaker::Lorem.sentences.join(" ") }

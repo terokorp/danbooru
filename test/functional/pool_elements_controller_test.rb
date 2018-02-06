@@ -5,12 +5,12 @@ class PoolElementsControllerTest < ActionController::TestCase
     setup do
       mock_pool_archive_service!
       start_pool_archive_transaction
-      @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
-      @mod = FactoryGirl.create(:moderator_user)
+      @user = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
+      @mod = FactoryBot.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = FactoryGirl.create(:post)
-      @pool = FactoryGirl.create(:pool, :name => "abc")
+      @post = FactoryBot.create(:post)
+      @pool = FactoryBot.create(:pool, :name => "abc")
     end
 
     teardown do

@@ -3,8 +3,8 @@ require 'test_helper'
 class BulkUpdateRequestsControllerTest < ActionController::TestCase
   context "BulkUpdateRequestsController" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @admin = FactoryGirl.create(:admin_user)
+      @user = FactoryBot.create(:user)
+      @admin = FactoryBot.create(:admin_user)
     end
 
     context "#new" do
@@ -25,7 +25,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#update" do
       setup do
         CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryGirl.create(:bulk_update_request)
+          @bulk_update_request = FactoryBot.create(:bulk_update_request)
         end
       end
 
@@ -45,7 +45,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#index" do
       setup do
         CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryGirl.create(:bulk_update_request)
+          @bulk_update_request = FactoryBot.create(:bulk_update_request)
         end
       end
 
@@ -58,7 +58,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#destroy" do
       setup do
         CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryGirl.create(:bulk_update_request)
+          @bulk_update_request = FactoryBot.create(:bulk_update_request)
         end
       end
 
@@ -72,7 +72,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
       context "for another member" do
         setup do
-          @another_user = FactoryGirl.create(:user)
+          @another_user = FactoryBot.create(:user)
         end
 
         should "fail" do
@@ -94,7 +94,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#approve" do
       setup do
         CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryGirl.create(:bulk_update_request)
+          @bulk_update_request = FactoryBot.create(:bulk_update_request)
         end
       end
 

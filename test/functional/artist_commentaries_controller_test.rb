@@ -3,12 +3,12 @@ require 'test_helper'
 class ArtistCommentariesControllerTest < ActionController::TestCase
   context "The artist commentaries controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @commentary1 = FactoryGirl.create(:artist_commentary)
-      @commentary2 = FactoryGirl.create(:artist_commentary)
+      @commentary1 = FactoryBot.create(:artist_commentary)
+      @commentary2 = FactoryBot.create(:artist_commentary)
     end
 
     teardown do
@@ -52,7 +52,7 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
         params = {
           artist_commentary: {
             original_title: "foo",
-            post_id: FactoryGirl.create(:post).id,
+            post_id: FactoryBot.create(:post).id,
           }
         }
 

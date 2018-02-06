@@ -9,7 +9,7 @@ class UploadTest < ActiveSupport::TestCase
 
   context "In all cases" do
     setup do
-      user = FactoryGirl.create(:contributor_user)
+      user = FactoryBot.create(:contributor_user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -28,12 +28,12 @@ class UploadTest < ActiveSupport::TestCase
 
       context "from a user that is limited" do
         setup do
-          CurrentUser.user = FactoryGirl.create(:user, :created_at => 1.year.ago)
+          CurrentUser.user = FactoryBot.create(:user, :created_at => 1.year.ago)
           User.any_instance.stubs(:upload_limit).returns(0)
         end
         
         should "fail creation" do
-          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
+          @upload = FactoryBot.build(:jpg_upload, :tag_string => "")
           @upload.save
           assert_equal(["You have reached your upload limit for the day"], @upload.errors.full_messages)
         end
@@ -41,42 +41,42 @@ class UploadTest < ActiveSupport::TestCase
 
       context "image size calculator" do
         should "discover the dimensions for a compressed SWF" do
-          @upload = FactoryGirl.create(:upload, :file_path => "#{Rails.root}/test/files/compressed.swf")
+          @upload = FactoryBot.create(:upload, :file_path => "#{Rails.root}/test/files/compressed.swf")
           @upload.calculate_dimensions(@upload.file_path)
           assert_equal(607, @upload.image_width)
           assert_equal(756, @upload.image_height)
         end
 
         should "discover the dimensions for a JPG with JFIF data" do
-          @upload = FactoryGirl.create(:jpg_upload)
+          @upload = FactoryBot.create(:jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(500, @upload.image_width)
           assert_equal(335, @upload.image_height)
         end
 
         should "discover the dimensions for a JPG with EXIF data" do
-          @upload = FactoryGirl.create(:exif_jpg_upload)
+          @upload = FactoryBot.create(:exif_jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(529, @upload.image_width)
           assert_equal(600, @upload.image_height)
         end
 
         should "discover the dimensions for a JPG with no header data" do
-          @upload = FactoryGirl.create(:blank_jpg_upload)
+          @upload = FactoryBot.create(:blank_jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(668, @upload.image_width)
           assert_equal(996, @upload.image_height)
         end
 
         should "discover the dimensions for a PNG" do
-          @upload = FactoryGirl.create(:png_upload)
+          @upload = FactoryBot.create(:png_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(768, @upload.image_width)
           assert_equal(1024, @upload.image_height)
         end
 
         should "discover the dimensions for a GIF" do
-          @upload = FactoryGirl.create(:gif_upload)
+          @upload = FactoryBot.create(:gif_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(400, @upload.image_width)
           assert_equal(400, @upload.image_height)
@@ -85,7 +85,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "content type calculator" do
         should "know how to parse jpeg, png, gif, and swf file headers" do
-          @upload = FactoryGirl.create(:jpg_upload)
+          @upload = FactoryBot.create(:jpg_upload)
           assert_equal("image/jpeg", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.jpg"))
           assert_equal("image/gif", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.gif"))
           assert_equal("image/png", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.png"))
@@ -94,7 +94,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "know how to parse jpeg, png, gif, and swf content types" do
-          @upload = FactoryGirl.create(:jpg_upload)
+          @upload = FactoryBot.create(:jpg_upload)
           assert_equal("jpg", @upload.content_type_to_file_ext("image/jpeg"))
           assert_equal("gif", @upload.content_type_to_file_ext("image/gif"))
           assert_equal("png", @upload.content_type_to_file_ext("image/png"))
@@ -116,7 +116,7 @@ class UploadTest < ActiveSupport::TestCase
         context "that is a pixiv ugoira" do
           setup do
             @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
-            @upload = FactoryGirl.create(:source_upload, :source => @url, :tag_string => "ugoira")
+            @upload = FactoryBot.create(:source_upload, :source => @url, :tag_string => "ugoira")
             @output_file = Tempfile.new("download")
           end
 
@@ -133,7 +133,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "initialize the final path after downloading a file" do
-          @upload = FactoryGirl.create(:source_upload)
+          @upload = FactoryBot.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
           assert_nothing_raised {@upload.download_from_source(path)}
           assert(File.exists?(path))
@@ -144,17 +144,17 @@ class UploadTest < ActiveSupport::TestCase
 
       context "determining if a file is downloadable" do
         should "classify HTTP sources as downloadable" do
-          @upload = FactoryGirl.create(:source_upload, :source => "http://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "http://www.example.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify HTTPS sources as downloadable" do
-          @upload = FactoryGirl.create(:source_upload, :source => "https://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "https://www.example.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify non-HTTP/HTTPS sources as not downloadable" do
-          @upload = FactoryGirl.create(:source_upload, :source => "ftp://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "ftp://www.example.com/1.jpg")
           assert_nil(@upload.is_downloadable?)
         end
       end
@@ -179,7 +179,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "hash calculator" do
         should "caculate the hash" do
-          @upload = FactoryGirl.create(:jpg_upload)
+          @upload = FactoryBot.create(:jpg_upload)
           @upload.calculate_hash(@upload.file_path)
           assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
         end
@@ -193,7 +193,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "generate several resized versions of the image" do
-          @upload = FactoryGirl.create(:large_jpg_upload)
+          @upload = FactoryBot.create(:large_jpg_upload)
           @upload.calculate_hash(@upload.file_path)
           @upload.calculate_dimensions(@upload.file_path)
           assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
@@ -205,7 +205,7 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       should "increment the uploaders post_upload_count" do
-        @upload = FactoryGirl.create(:source_upload)
+        @upload = FactoryBot.create(:source_upload)
         assert_difference("CurrentUser.user.post_upload_count", 1) do
           @upload.process!
           CurrentUser.user.reload
@@ -214,7 +214,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "with an artist commentary" do
         setup do
-          @upload = FactoryGirl.create(:source_upload,
+          @upload = FactoryBot.create(:source_upload,
             :rating => "s",
             :uploader_ip_addr => "127.0.0.1",
             :tag_string => "hoge foo"
@@ -232,7 +232,7 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       should "process completely for a downloaded image" do
-        @upload = FactoryGirl.create(:source_upload,
+        @upload = FactoryBot.create(:source_upload,
           :rating => "s",
           :uploader_ip_addr => "127.0.0.1",
           :tag_string => "hoge foo"
@@ -258,7 +258,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "process completely for a pixiv ugoira" do
-      @upload = FactoryGirl.create(:source_upload,
+      @upload = FactoryBot.create(:source_upload,
         :source => "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654",
         :rating => "s",
         :uploader_ip_addr => "127.0.0.1",
@@ -279,7 +279,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "process completely for an uploaded image" do
-      @upload = FactoryGirl.create(:jpg_upload,
+      @upload = FactoryBot.create(:jpg_upload,
         :rating => "s",
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"
@@ -304,7 +304,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "process completely for a null source" do
-      @upload = FactoryGirl.create(:jpg_upload, :source => nil)
+      @upload = FactoryBot.create(:jpg_upload, :source => nil)
 
       assert_difference("Post.count") do
         assert_nothing_raised {@upload.process!}
@@ -312,7 +312,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "delete the temporary file upon completion" do
-      @upload = FactoryGirl.create(:source_upload,
+      @upload = FactoryBot.create(:source_upload,
         :rating => "s",
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"

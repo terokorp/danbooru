@@ -3,11 +3,11 @@ require "test_helper"
 class PostsControllerTest < ActionController::TestCase
   context "The posts controller" do
     setup do
-      @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
+      @user = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
       @api_key = ApiKey.generate!(@user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = FactoryGirl.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
+      @post = FactoryBot.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
     end
 
     teardown do
@@ -18,7 +18,7 @@ class PostsControllerTest < ActionController::TestCase
     context "for api calls" do
       context "passing the api limit" do
         setup do
-          @post = FactoryGirl.create(:post)
+          @post = FactoryBot.create(:post)
           @bucket = TokenBucket.create(user_id: @user.id, token_count: 5, last_touched_at: Time.now)
           User.any_instance.stubs(:api_burst_limit).returns(5)
           User.any_instance.stubs(:api_regen_multiplier).returns(0)
@@ -99,7 +99,7 @@ class PostsControllerTest < ActionController::TestCase
 
     context "show_seq action" do
       should "render" do
-        posts = FactoryGirl.create_list(:post, 3)
+        posts = FactoryBot.create_list(:post, 3)
 
         get :show_seq, { seq: "prev", id: posts[1].id }
         assert_redirected_to(posts[2])
@@ -154,7 +154,7 @@ class PostsControllerTest < ActionController::TestCase
       end
 
       should "not allow reverting to a previous version of another post" do
-        @post2 = FactoryGirl.create(:post, :uploader_id => @user.id, :tag_string => "herp")
+        @post2 = FactoryBot.create(:post, :uploader_id => @user.id, :tag_string => "herp")
 
         post :revert, { :id => @post.id, :version_id => @post2.versions.first.id }, {:user_id => @user.id}
         @post.reload

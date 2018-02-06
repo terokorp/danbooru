@@ -3,12 +3,12 @@ require 'test_helper'
 class ForumTopicsControllerTest < ActionController::TestCase
   context "The forum topics controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = FactoryGirl.create(:user)
-      @mod = FactoryGirl.create(:moderator_user)
-      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user, :original_post_attributes => {:body => "xxx"})
+      @other_user = FactoryBot.create(:user)
+      @mod = FactoryBot.create(:moderator_user)
+      @forum_topic = FactoryBot.create(:forum_topic, :title => "my forum topic", :creator => @user, :original_post_attributes => {:body => "xxx"})
     end
 
     teardown do
@@ -29,11 +29,11 @@ class ForumTopicsControllerTest < ActionController::TestCase
       end
 
       should "not bump the forum for users without access" do
-        @gold_user = FactoryGirl.create(:gold_user)
+        @gold_user = FactoryBot.create(:gold_user)
         CurrentUser.user = @gold_user
 
         # An open topic should bump...
-        @open_topic = FactoryGirl.create(:forum_topic)
+        @open_topic = FactoryBot.create(:forum_topic)
         assert_equal(true, @gold_user.has_forum_been_updated?)
 
         # Marking it as read should clear it...
@@ -45,7 +45,7 @@ class ForumTopicsControllerTest < ActionController::TestCase
 
         # Then adding an unread private topic should not bump.
         CurrentUser.scoped(@mod) do
-          FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
+          FactoryBot.create(:forum_post, :topic_id => @forum_topic.id)
         end
         assert_equal(false, @gold_user.reload.has_forum_been_updated?)
       end
@@ -75,8 +75,8 @@ class ForumTopicsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @topic1 = FactoryGirl.create(:forum_topic, :is_sticky => true, :creator => @user, :original_post_attributes => {:body => "xxx"})
-        @topic2 = FactoryGirl.create(:forum_topic, :creator => @user, :original_post_attributes => {:body => "xxx"})
+        @topic1 = FactoryBot.create(:forum_topic, :is_sticky => true, :creator => @user, :original_post_attributes => {:body => "xxx"})
+        @topic2 = FactoryBot.create(:forum_topic, :creator => @user, :original_post_attributes => {:body => "xxx"})
       end
 
       should "list all forum topics" do
@@ -148,7 +148,7 @@ class ForumTopicsControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @post = FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
+        @post = FactoryBot.create(:forum_post, :topic_id => @forum_topic.id)
       end
 
       should "destroy the topic and any associated posts" do

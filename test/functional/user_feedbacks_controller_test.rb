@@ -3,9 +3,9 @@ require 'test_helper'
 class UserFeedbacksControllerTest < ActionController::TestCase
   context "The user feedbacks controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @critic = FactoryGirl.create(:gold_user)
-      @mod = FactoryGirl.create(:moderator_user)
+      @user = FactoryBot.create(:user)
+      @critic = FactoryBot.create(:gold_user)
+      @mod = FactoryBot.create(:moderator_user)
       CurrentUser.user = @critic
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -24,7 +24,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "edit action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback)
+        @user_feedback = FactoryBot.create(:user_feedback)
       end
 
       should "render" do
@@ -35,7 +35,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback)
+        @user_feedback = FactoryBot.create(:user_feedback)
       end
 
       should "render" do
@@ -63,7 +63,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "update action" do
       should "update the feedback" do
-        @feedback = FactoryGirl.create(:user_feedback, user: @user, category: "negative")
+        @feedback = FactoryBot.create(:user_feedback, user: @user, category: "negative")
         put :update, { id: @feedback.id, user_feedback: { category: "positive" }}, { user_id: @critic.id }
 
         assert_redirected_to(@feedback)
@@ -73,7 +73,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback, user: @user)
+        @user_feedback = FactoryBot.create(:user_feedback, user: @user)
       end
 
       should "delete a feedback" do
@@ -90,7 +90,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
         end
 
         should "not allow deleting feedbacks given to themselves" do
-          @user_feedback = FactoryGirl.create(:user_feedback, user: @mod)
+          @user_feedback = FactoryBot.create(:user_feedback, user: @mod)
           assert_difference "UserFeedback.count", 0 do
             post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
           end

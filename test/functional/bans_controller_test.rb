@@ -3,11 +3,11 @@ require 'test_helper'
 class BansControllerTest < ActionController::TestCase
   context "A bans controller" do
     setup do
-      @mod = FactoryGirl.create(:moderator_user)
+      @mod = FactoryBot.create(:moderator_user)
       CurrentUser.user = @mod
       CurrentUser.ip_addr = "127.0.0.1"
-      @user = FactoryGirl.create(:user)
-      @ban = FactoryGirl.create(:ban, :user_id => @user.id)
+      @user = FactoryBot.create(:user)
+      @ban = FactoryBot.create(:ban, :user_id => @user.id)
     end
 
     teardown do

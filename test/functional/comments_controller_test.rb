@@ -3,16 +3,16 @@ require 'test_helper'
 class CommentsControllerTest < ActionController::TestCase
   context "A comments controller" do
     setup do
-      @mod = FactoryGirl.create(:moderator_user)
-      @user = FactoryGirl.create(:member_user)
+      @mod = FactoryBot.create(:moderator_user)
+      @user = FactoryBot.create(:member_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
 
-      @post = FactoryGirl.create(:post)
-      @comment = FactoryGirl.create(:comment, :post => @post)
+      @post = FactoryBot.create(:post)
+      @comment = FactoryBot.create(:comment, :post => @post)
       CurrentUser.scoped(@mod) do
-        @mod_comment = FactoryGirl.create(:comment, :post => @post)
+        @mod_comment = FactoryBot.create(:comment, :post => @post)
       end
     end
 
@@ -120,7 +120,7 @@ class CommentsControllerTest < ActionController::TestCase
           id: @comment.id,
           comment: {
             do_not_bump_post: true,
-            post_id: FactoryGirl.create(:post).id,
+            post_id: FactoryBot.create(:post).id,
           }
         }
 
@@ -141,14 +141,14 @@ class CommentsControllerTest < ActionController::TestCase
     context "create action"do
       should "create a comment" do
         assert_difference("Comment.count", 1) do
-          post :create, {:comment => FactoryGirl.attributes_for(:comment, :post_id => @post.id)}, {:user_id => @user.id}
+          post :create, {:comment => FactoryBot.attributes_for(:comment, :post_id => @post.id)}, {:user_id => @user.id}
         end
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
       end
 
       should "not allow commenting on nonexistent posts" do
-        post :create, {:comment => FactoryGirl.attributes_for(:comment, :post_id => -1)}, {:user_id => @user.id}
+        post :create, {:comment => FactoryBot.attributes_for(:comment, :post_id => -1)}, {:user_id => @user.id}
         assert_response :error
       end
     end

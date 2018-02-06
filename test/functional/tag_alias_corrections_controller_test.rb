@@ -3,10 +3,10 @@ require 'test_helper'
 class TagAliasCorrectionsControllerTest < ActionController::TestCase
   context "The tag alias correction controller" do
     setup do
-      @admin = FactoryGirl.create(:admin_user)
+      @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
-      @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
     end
 
     teardown do

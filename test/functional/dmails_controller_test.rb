@@ -3,11 +3,11 @@ require 'test_helper'
 class DmailsControllerTest < ActionController::TestCase
   context "The dmails controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @unrelated_user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
+      @unrelated_user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @dmail = FactoryGirl.create(:dmail, :owner => @user)
+      @dmail = FactoryBot.create(:dmail, :owner => @user)
     end
 
     teardown do
@@ -23,7 +23,7 @@ class DmailsControllerTest < ActionController::TestCase
 
       context "with a respond_to_id" do
         should "check privileges" do
-          @user2 = FactoryGirl.create(:user)
+          @user2 = FactoryBot.create(:user)
           get :new, {:respond_to_id => @dmail}, {:user_id => @user2.id}
           assert_response 403
         end
@@ -64,7 +64,7 @@ class DmailsControllerTest < ActionController::TestCase
       end
 
       should "work for banned users" do
-        ban = FactoryGirl.create(:ban, :user => @user, :banner => FactoryGirl.create(:admin_user))
+        ban = FactoryBot.create(:ban, :user => @user, :banner => FactoryGirl.create(:admin_user))
         get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
 
         assert_response :success
@@ -85,7 +85,7 @@ class DmailsControllerTest < ActionController::TestCase
 
     context "create action" do
       setup do
-        @user_2 = FactoryGirl.create(:user)
+        @user_2 = FactoryBot.create(:user)
       end
 
       should "create two messages, one for the sender and one for the recipient" do

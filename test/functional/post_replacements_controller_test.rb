@@ -5,12 +5,12 @@ class PostReplacementsControllerTest < ActionController::TestCase
     setup do
       Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
-      @user = FactoryGirl.create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
+      @user = FactoryBot.create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @post = FactoryGirl.create(:post)
-      @post_replacement = FactoryGirl.create(:post_replacement, post_id: @post.id)
+      @post = FactoryBot.create(:post)
+      @post_replacement = FactoryBot.create(:post_replacement, post_id: @post.id)
     end
 
     teardown do

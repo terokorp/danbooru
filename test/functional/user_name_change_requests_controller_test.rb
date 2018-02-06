@@ -3,8 +3,8 @@ require 'test_helper'
 class UserNameChangeRequestsControllerTest < ActionController::TestCase
   context "The user name change requests controller" do
     setup do
-      @user = FactoryGirl.create(:gold_user)
-      @admin = FactoryGirl.create(:admin_user)
+      @user = FactoryBot.create(:gold_user)
+      @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @change_request = UserNameChangeRequest.create!(
@@ -37,7 +37,7 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
 
       context "when the current user is not an admin and does not own the request" do
         setup do
-          CurrentUser.user = FactoryGirl.create(:user)
+          CurrentUser.user = FactoryBot.create(:user)
         end
 
         should "fail" do

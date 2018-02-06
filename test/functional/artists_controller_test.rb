@@ -18,13 +18,13 @@ class ArtistsControllerTest < ActionController::TestCase
 
   context "An artists controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @artist = FactoryGirl.create(:artist, :notes => "message")
+      @artist = FactoryBot.create(:artist, :notes => "message")
 
-      @masao = FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://www.pixiv.net/member.php?id=32777")
-      @artgerm = FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
+      @masao = FactoryBot.create(:artist, :name => "masao",   :url_string => "http://www.pixiv.net/member.php?id=32777")
+      @artgerm = FactoryBot.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
     end
 
     teardown do
@@ -67,7 +67,7 @@ class ArtistsControllerTest < ActionController::TestCase
     end
 
     should "ban an artist" do
-      CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
+      CurrentUser.scoped(FactoryBot.create(:admin_user)) do
         put :ban, { id: @artist.id }, { user_id: CurrentUser.id }
       end
 
@@ -77,7 +77,7 @@ class ArtistsControllerTest < ActionController::TestCase
     end
 
     should "unban an artist" do
-      CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
+      CurrentUser.scoped(FactoryBot.create(:admin_user)) do
         @artist.ban!
         put :unban, { id: @artist.id }, { user_id: CurrentUser.id }
       end
@@ -121,7 +121,7 @@ class ArtistsControllerTest < ActionController::TestCase
 
     should "create an artist" do
       assert_difference("Artist.count", 1) do
-        attributes = FactoryGirl.attributes_for(:artist)
+        attributes = FactoryBot.attributes_for(:artist)
         attributes.delete(:is_active)
         post :create, {:artist => attributes}, {:user_id => @user.id}
       end
@@ -131,9 +131,9 @@ class ArtistsControllerTest < ActionController::TestCase
 
     context "with an artist that has notes" do
       setup do
-        @artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+        @artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
         @wiki_page = @artist.wiki_page
-        @another_user = FactoryGirl.create(:user)
+        @another_user = FactoryBot.create(:user)
       end
 
       should "update an artist" do
@@ -174,7 +174,7 @@ class ArtistsControllerTest < ActionController::TestCase
         end
 
         should "merge the new notes with the existing wiki page's contents if a wiki page for the new name already exists" do
-          existing_wiki_page = FactoryGirl.create(:wiki_page, :title => "bbb", :body => "xxx")
+          existing_wiki_page = FactoryBot.create(:wiki_page, :title => "bbb", :body => "xxx")
           post :update, {:id => @artist.id, :artist => {:name => "bbb", :notes => "yyy"}}, {:user_id => @user.id}
           existing_wiki_page.reload
           assert_equal("bbb", existing_wiki_page.title)
@@ -184,7 +184,7 @@ class ArtistsControllerTest < ActionController::TestCase
     end
 
     should "delete an artist" do
-      CurrentUser.scoped(FactoryGirl.create(:builder_user)) do
+      CurrentUser.scoped(FactoryBot.create(:builder_user)) do
         delete :destroy, { id: @artist.id }, { user_id: CurrentUser.id }
       end
 
@@ -193,7 +193,7 @@ class ArtistsControllerTest < ActionController::TestCase
     end
 
     should "undelete an artist" do
-      CurrentUser.scoped(FactoryGirl.create(:builder_user)) do
+      CurrentUser.scoped(FactoryBot.create(:builder_user)) do
         put :undelete, { id: @artist.id }, { user_id: CurrentUser.id }
       end
 
@@ -210,7 +210,7 @@ class ArtistsControllerTest < ActionController::TestCase
       end
 
       should "not allow reverting to a previous version of another artist" do
-        @artist2 = FactoryGirl.create(:artist)
+        @artist2 = FactoryBot.create(:artist)
 
         post :revert, { :id => @artist.id, :version_id => @artist2.versions(true).first.id }, {:user_id => @user.id}
         @artist.reload

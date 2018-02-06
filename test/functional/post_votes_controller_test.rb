@@ -3,10 +3,10 @@ require 'test_helper'
 class PostVotesControllerTest < ActionController::TestCase
   context "The post vote controller" do
     setup do
-      @user = FactoryGirl.create(:gold_user)
+      @user = FactoryBot.create(:gold_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = FactoryGirl.create(:post)
+      @post = FactoryBot.create(:post)
     end
 
     teardown do
@@ -16,7 +16,7 @@ class PostVotesControllerTest < ActionController::TestCase
 
     context "create action" do
       should "not allow anonymous users to vote" do
-        p1 = FactoryGirl.create(:post)
+        p1 = FactoryBot.create(:post)
         post :create, {:post_id => p1.id, :score => "up", :format => "js"}
 
         assert_response 403
@@ -24,8 +24,8 @@ class PostVotesControllerTest < ActionController::TestCase
       end
 
       should "not allow banned users to vote" do
-        CurrentUser.scoped(FactoryGirl.create(:banned_user)) do
-          p1 = FactoryGirl.create(:post)
+        CurrentUser.scoped(FactoryBot.create(:banned_user)) do
+          p1 = FactoryBot.create(:post)
           post :create, {:post_id => p1.id, :score => "up", :format => "js"}, {:user_id => CurrentUser.id}
 
           assert_response 403
@@ -34,8 +34,8 @@ class PostVotesControllerTest < ActionController::TestCase
       end
 
       should "not allow members to vote" do
-        CurrentUser.scoped(FactoryGirl.create(:member_user)) do
-          p1 = FactoryGirl.create(:post)
+        CurrentUser.scoped(FactoryBot.create(:member_user)) do
+          p1 = FactoryBot.create(:post)
           post :create, {:post_id => p1.id, :score => "up", :format => "js"}, {:user_id => CurrentUser.id}
 
           assert_response 403

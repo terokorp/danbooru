@@ -3,7 +3,7 @@ require 'test_helper'
 class FavoriteGroupsControllerTest < ActionController::TestCase
   context "The favorite groups controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -17,7 +17,7 @@ class FavoriteGroupsControllerTest < ActionController::TestCase
 
     context "show action" do
       should "render" do
-        favgroup = FactoryGirl.create(:favorite_group)
+        favgroup = FactoryBot.create(:favorite_group)
 
         get :show, { id: favgroup.id }
         assert_response :success
@@ -33,14 +33,14 @@ class FavoriteGroupsControllerTest < ActionController::TestCase
 
     context "create action" do
       should "render" do
-        post :create, { favorite_group: FactoryGirl.attributes_for(:favorite_group) }, { user_id: @user.id }
+        post :create, { favorite_group: FactoryBot.attributes_for(:favorite_group) }, { user_id: @user.id }
         assert_redirected_to favorite_groups_path
       end
     end
 
     context "edit action" do
       should "render" do
-        favgroup = FactoryGirl.create(:favorite_group, creator: @user)
+        favgroup = FactoryBot.create(:favorite_group, creator: @user)
 
         get :edit, { id: favgroup.id }, { user_id: @user.id }
         assert_response :success
@@ -49,7 +49,7 @@ class FavoriteGroupsControllerTest < ActionController::TestCase
 
     context "update action" do
       should "render" do
-        favgroup = FactoryGirl.create(:favorite_group, creator: @user)
+        favgroup = FactoryBot.create(:favorite_group, creator: @user)
         params = { id: favgroup.id, favorite_group: { name: "foo" } }
 
         put :update, params, { user_id: @user.id }
@@ -60,7 +60,7 @@ class FavoriteGroupsControllerTest < ActionController::TestCase
 
     context "destroy action" do
       should "render" do
-        favgroup = FactoryGirl.create(:favorite_group, creator: @user)
+        favgroup = FactoryBot.create(:favorite_group, creator: @user)
 
         delete :destroy, { id: favgroup.id }, { user_id: @user.id }
         assert_redirected_to favorite_groups_path
@@ -69,8 +69,8 @@ class FavoriteGroupsControllerTest < ActionController::TestCase
 
     context "add_post action" do
       should "render" do
-        favgroup = FactoryGirl.create(:favorite_group, creator: @user)
-        post = FactoryGirl.create(:post)
+        favgroup = FactoryBot.create(:favorite_group, creator: @user)
+        post = FactoryBot.create(:post)
 
         put :add_post, { id: favgroup.id, post_id: post.id, format: "js" }, { user_id: @user.id }
         assert_response :success

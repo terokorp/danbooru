@@ -3,13 +3,13 @@ require 'test_helper'
 class ForumPostsControllerTest < ActionController::TestCase
   context "The forum posts controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = FactoryGirl.create(:user)
-      @mod = FactoryGirl.create(:moderator_user)
-      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user)
-      @forum_post = FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+      @other_user = FactoryBot.create(:user)
+      @mod = FactoryBot.create(:moderator_user)
+      @forum_topic = FactoryBot.create(:forum_topic, :title => "my forum topic", :creator => @user)
+      @forum_post = FactoryBot.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
     end
 
     teardown do
@@ -46,9 +46,9 @@ class ForumPostsControllerTest < ActionController::TestCase
       context "with private topics" do
         setup do
           CurrentUser.user = @mod
-          @mod_topic = FactoryGirl.create(:mod_up_forum_topic)
+          @mod_topic = FactoryBot.create(:mod_up_forum_topic)
           @mod_posts = 2.times.map do
-            FactoryGirl.create(:forum_post, :topic_id => @mod_topic.id)
+            FactoryBot.create(:forum_post, :topic_id => @mod_topic.id)
           end
           @mod_post_ids = ([@forum_post] + @mod_posts).map(&:id).reverse
         end

@@ -4,7 +4,7 @@ class PostVersionsControllerTest < ActionController::TestCase
   def setup
     super
 
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -19,7 +19,7 @@ class PostVersionsControllerTest < ActionController::TestCase
   context "The post versions controller" do
     context "index action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @post = FactoryBot.create(:post)
         @post.update_attributes(:tag_string => "1 2", :source => "xxx")
         @post.update_attributes(:tag_string => "2 3", :rating => "e")
       end

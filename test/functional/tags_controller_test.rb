@@ -3,11 +3,11 @@ require 'test_helper'
 class TagsControllerTest < ActionController::TestCase
   context "The tags controller" do
     setup do
-      @user = FactoryGirl.create(:builder_user)
+      @user = FactoryBot.create(:builder_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @tag = FactoryGirl.create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
+      @tag = FactoryBot.create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
     end
 
     teardown do
@@ -52,7 +52,7 @@ class TagsControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @mod = FactoryGirl.create(:moderator_user)
+        @mod = FactoryBot.create(:moderator_user)
       end
 
       should "update the tag" do
@@ -81,7 +81,7 @@ class TagsControllerTest < ActionController::TestCase
         end
 
         should "not update the category for a member" do
-          CurrentUser.user = FactoryGirl.create(:member_user)
+          CurrentUser.user = FactoryBot.create(:member_user)
           post :update, {id: @tag.id, tag: { category: Tag.categories.general }}, {user_id: CurrentUser.id}
 
           assert_not_equal(Tag.categories.general, @tag.reload.category)
