@@ -39,9 +39,7 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(true, File.exists?(@post.large_file_path))
         assert_equal(true, File.exists?(@post.file_path))
 
-        TestAfterCommit.with_commits(true) do
-          @post.expunge!
-        end
+        @post.expunge!
 
         assert_equal(false, File.exists?(@post.preview_file_path))
         assert_equal(false, File.exists?(@post.large_file_path))
@@ -49,9 +47,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "remove all favorites" do
-        TestAfterCommit.with_commits(true) do
-          @post.expunge!
-        end
+        @post.expunge!
 
         assert_equal(0, Favorite.for_user(@user.id).where("post_id = ?", @post.id).count)
       end
@@ -86,9 +82,7 @@ class PostTest < ActiveSupport::TestCase
         mock_iqdb_service!
         Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
 
-        TestAfterCommit.with_commits(true) do
-          @post.expunge!
-        end
+        @post.expunge!
       end
 
       context "that is status locked" do
