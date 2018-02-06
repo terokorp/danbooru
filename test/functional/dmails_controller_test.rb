@@ -64,7 +64,7 @@ class DmailsControllerTest < ActionController::TestCase
       end
 
       should "work for banned users" do
-        ban = FactoryBot.create(:ban, :user => @user, :banner => FactoryGirl.create(:admin_user))
+        ban = FactoryBot.create(:ban, :user => @user, :banner => FactoryBot.create(:admin_user))
         get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
 
         assert_response :success

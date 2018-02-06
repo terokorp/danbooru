@@ -4,10 +4,10 @@ module Moderator
   class TagsControllerTest < ActionController::TestCase
     context "The tags controller" do
       setup do
-        @user = FactoryGirl.create(:moderator_user)
+        @user = FactoryBot.create(:moderator_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        @post = FactoryGirl.create(:post)
+        @post = FactoryBot.create(:post)
       end
 
       should "render the edit action" do

@@ -4,9 +4,9 @@ module Explore
   class PostsControllerTest < ActionController::TestCase
     context "in all cases" do
       setup do
-        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
-        FactoryGirl.create(:post)
+        FactoryBot.create(:post)
       end
 
       context "#popular" do

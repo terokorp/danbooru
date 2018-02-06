@@ -3,11 +3,11 @@ require 'test_helper'
 class Admin::UsersControllerTest < ActionController::TestCase
   context "Admin::UsersController" do
     setup do
-      @mod = FactoryGirl.create(:moderator_user)
+      @mod = FactoryBot.create(:moderator_user)
       CurrentUser.user = @mod
       CurrentUser.ip_addr = "127.0.0.1"
-      @user = FactoryGirl.create(:user)
-      @admin = FactoryGirl.create(:admin_user)
+      @user = FactoryBot.create(:user)
+      @admin = FactoryBot.create(:admin_user)
     end
 
     context "#edit" do

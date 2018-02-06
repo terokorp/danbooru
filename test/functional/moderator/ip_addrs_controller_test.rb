@@ -7,10 +7,10 @@ module Moderator
         PoolArchive.delete_all
         PostArchive.delete_all
         
-        @user = FactoryGirl.create(:moderator_user)
+        @user = FactoryBot.create(:moderator_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        FactoryGirl.create(:comment)
+        FactoryBot.create(:comment)
       end
 
       teardown do
