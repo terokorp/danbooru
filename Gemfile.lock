@@ -125,8 +125,11 @@ GEM
     equalizer (0.0.11)
     erubi (1.7.0)
     execjs (2.7.0)
-    factory_girl (4.9.0)
+    factory_bot (4.8.2)
       activesupport (>= 3.0.0)
+    factory_bot_rails (4.8.2)
+      factory_bot (~> 4.8.2)
+      railties (>= 3.0.0)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
     ffaker (2.8.1)
@@ -181,6 +184,10 @@ GEM
     jwt (1.5.6)
     kgio (2.11.2)
     libv8 (3.16.14.19)
+    listen (3.1.5)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+      ruby_dep (~> 1.2)
     little-plugger (1.1.4)
     logging (2.2.2)
       little-plugger (~> 1.1)
@@ -245,8 +252,6 @@ GEM
     os (0.9.6)
     pg (0.21.0)
     pg (0.21.0-x64-mingw32)
-    protected_attributes (1.1.4)
-      activemodel (>= 4.0.1, < 5.0)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -298,6 +303,7 @@ GEM
     retriable (2.1.0)
     rmagick (2.16.0)
     ruby-prof (0.17.0)
+    ruby_dep (1.5.0)
     rubyzip (1.2.1)
     safe_yaml (1.0.4)
     sanitize (4.6.0)
@@ -349,8 +355,6 @@ GEM
       faraday (~> 0.10)
     term-ansicolor (1.6.0)
       tins (~> 1.0)
-    test_after_commit (1.1.0)
-      activerecord (>= 3.2)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -370,7 +374,7 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
-    tzinfo (1.2.4)
+    tzinfo (1.2.5)
       thread_safe (~> 0.1)
     tzinfo-data (1.2018.3)
       tzinfo (>= 1.0.0)
@@ -423,12 +427,13 @@ DEPENDENCIES
   diff-lcs
   dotenv-rails
   dtext_rb!
-  factory_girl
+  factory_bot_rails
   ffaker
   foreman
   google-api-client
   highline
   httparty
+  listen
   mechanize
   memcache-client
   memcache_mock
@@ -437,8 +442,7 @@ DEPENDENCIES
   net-sftp
   newrelic_rpm
   oauth2
-  pg (= 0.21.0)
-  protected_attributes
+  pg (~> 0.21.0)
   pry-byebug
   radix62 (~> 1.0.1)
   rails (~> 5.1)
@@ -460,7 +464,6 @@ DEPENDENCIES
   streamio-ffmpeg
   stripe
   term-ansicolor
-  test_after_commit
   therubyracer
   timecop
   twitter
