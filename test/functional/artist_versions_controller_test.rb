@@ -14,12 +14,14 @@ class ArtistVersionsControllerTest < ActionController::TestCase
     end
 
     should "get the index page" do
-      get :index, {}, {:user_id => CurrentUser.id}
+      session[:user_id] = CurrentUser.id
+      get :index
       assert_response :success
     end
 
     should "get the index page when searching for something" do
-      get :index, {:search => {:name => @artist.name}}, {:user_id => CurrentUser.id}
+      session[:user_id] = CurrentUser.id
+      get :index, params: {:search => {:name => @artist.name}}
       assert_response :success
     end
   end

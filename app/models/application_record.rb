@@ -136,7 +136,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :UserMethods do
     class_methods do
-      def belongs_to_creator
+      def belongs_to_creator(options = {})
         class_eval do
           belongs_to :creator, options.merge(class_name: "User")
           before_validation(on: :create) do |rec| 

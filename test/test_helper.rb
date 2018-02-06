@@ -45,15 +45,30 @@ class ActiveSupport::TestCase
   end
 end
 
-class ActionController::TestCase
-  def assert_authentication_passes(action, http_method, role, params, session)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_response :success
+class ActionDispatch::IntegrationTest
+  def method_authenticated(method, url, user, options)
+    api_key = ApiKey.generate!(user) unless user.api_key.present?
+    self.send(method, url, options.merge(headers: {"HTTP_AUTHORIZATION" => build_authorization_string(user, api_key)}))
   end
 
-  def assert_authentication_fails(action, http_method, role)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_redirected_to(new_sessions_path)
+  def build_authorization_string(user, api_key)
+    "Basic " + Base64.strict_encode64("#{user.name}:#{api_key.key}")
+  end
+
+  def get_authenticated(url, user, options = {})
+    method_authenticated(:get, url, user, options)
+  end
+
+  def post_authenticated(url, user, options = {})
+    method_authenticated(:post, url, user, options)
+  end
+
+  def put_authenticated(url, user, options = {})
+    method_authenticated(:put, url, user, options)
+  end
+
+  def delete_authenticated(url, user, options = {})
+    method_authenticated(:delete, url, user, options)
   end
 
   def setup

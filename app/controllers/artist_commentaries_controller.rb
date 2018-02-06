@@ -26,7 +26,6 @@ class ArtistCommentariesController < ApplicationController
   def create_or_update
     @artist_commentary = ArtistCommentary.find_or_initialize_by(post_id: params.dig(:artist_commentary, :post_id))
     @artist_commentary.update(commentary_params)
-
     respond_with(@artist_commentary)
   end
 
@@ -34,7 +33,6 @@ class ArtistCommentariesController < ApplicationController
     @artist_commentary = ArtistCommentary.find_by_post_id!(params[:id])
     @version = @artist_commentary.versions.find(params[:version_id])
     @artist_commentary.revert_to!(@version)
-    respond_with(@artist_commentary)
   end
 
 private

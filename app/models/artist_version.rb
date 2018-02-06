@@ -1,5 +1,5 @@
 class ArtistVersion < ApplicationRecord
-  belongs_to :updater, :class_name => "User"
+  belongs_to_updater
   belongs_to :artist
   delegate :visible?, :to => :artist
 
@@ -104,9 +104,5 @@ class ArtistVersion < ApplicationRecord
 
   def previous
     ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
-  end
-
-  def updater_name
-    User.id_to_name(updater_id)
   end
 end

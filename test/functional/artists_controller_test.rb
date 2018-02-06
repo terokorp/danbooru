@@ -2,7 +2,8 @@ require 'test_helper'
 
 class ArtistsControllerTest < ActionController::TestCase
   def assert_artist_found(expected_artist, source_url)
-    get :finder, { :format => :json, :url => source_url }, { :user_id => @user.id }
+    session[:user_id] = @user.id
+    get :finder, params: { :format => :json, :url => source_url }
 
     assert_response :success
     assert_equal(1, assigns(:artists).size, "Testing URL: #{source_url}")

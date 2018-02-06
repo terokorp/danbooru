@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ArtistCommentariesControllerTest < ActionController::TestCase
+class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
   context "The artist commentaries controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -17,7 +17,7 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
 
     context "index action" do
       should "render" do
-        get :index
+        get artist_commentaries_path
         assert_response :success
       end
 
@@ -32,17 +32,17 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           }
         }
 
-        get :index, params: params
+        get artist_commentaries_path(params)
         assert_response :success
       end
     end
 
     context "show action" do
       should "render" do
-        get :show, params: { id: @commentary1.id }
+        get artist_commentary_path(@commentary1.id)
         assert_redirected_to(@commentary1.post)
 
-        get :show, params: { post_id: @commentary1.post_id }
+        get artist_commentary_path(post_id: @commentary1.post_id)
         assert_redirected_to(@commentary1.post)
       end
     end
@@ -53,12 +53,14 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           artist_commentary: {
             original_title: "foo",
             post_id: FactoryBot.create(:post).id,
-          }
+          },
+          format: "js"
         }
 
-        session[:user_id] = @user.id
-        post :create_or_update, params: params
-        assert_redirected_to(ArtistCommentary.find_by_post_id(params[:artist_commentary][:post_id]))
+        assert_difference("ArtistCommentary.count", 1) do
+          put_authenticated create_or_update_artist_commentaries_path(params), @user, as: :js
+        end
+        assert_response :success
       end
 
       should "render for update" do
@@ -66,12 +68,13 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           artist_commentary: {
             post_id: @commentary1.post_id,
             original_title: "foo",
-          }
+          },
+          format: "js"
         }
 
-        session[:user_id] = @user.id
-        post :create_or_update, params: params
-        assert_redirected_to(@commentary1)
+        put_authenticated create_or_update_artist_commentaries_path(params), @user
+        @commentary1.reload
+        assert_response :success
         assert_equal("foo", @commentary1.reload.original_title)
       end
     end
@@ -80,26 +83,20 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
       should "work" do
         original_title = @commentary1.original_title
         @commentary1.update(original_title: "foo")
-
-        session[:user_id] = @user.id
         @commentary1.reload
-        post :revert, params: { :id => @commentary1.post_id, :version_id => @commentary1.versions.first.id }
-        assert_redirected_to(@commentary1)
+        put_authenticated revert_artist_commentary_path(@commentary1.post_id, version_id: @commentary1.versions.first.id, format: "js"), @user
+        assert_response :success
         assert_equal(original_title, @commentary1.reload.original_title)
       end
 
       should "return 404 when trying to revert a nonexistent commentary" do
-        session[:user_id] = @user.id
-        post :revert, params: { :id => -1, :version_id => -1 }
-
+        put_authenticated revert_artist_commentary_path(-1, version_id: -1, format: "js"), @user
         assert_response 404
       end
 
       should "not allow reverting to a previous version of another artist commentary" do
-        session[:user_id] = @user.id
-        post :revert, params: { :id => @commentary1.post_id, :version_id => @commentary2.versions.first.id }
+        put_authenticated revert_artist_commentary_path(@commentary1.post_id, version_id: @commentary2.versions.first.id, format: "js"), @user
         @commentary1.reload
-
         assert_not_equal(@commentary1.original_title, @commentary2.original_title)
         assert_response :missing
       end
