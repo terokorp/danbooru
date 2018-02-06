@@ -73,7 +73,7 @@ end
 group :test do
   gem "shoulda-context"
   gem "shoulda-matchers"
-  gem "factory_bot_rails"
+  gem "factory_bot"
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
