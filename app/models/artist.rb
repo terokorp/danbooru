@@ -17,6 +17,7 @@ class Artist < ApplicationRecord
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   has_one :tag, :foreign_key => "name", :primary_key => "name"
+  attribute :notes, :string
 
   scope :active, lambda { where(is_active: true) }
   scope :deleted, lambda { where(is_active: false) }
@@ -266,7 +267,7 @@ class Artist < ApplicationRecord
       ArtistVersion.create(
         :artist_id => id,
         :name => name,
-        :updater_id => CurrentUser.user.id,
+        :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
         :url_string => url_string,
         :is_active => is_active,
@@ -364,9 +365,9 @@ class Artist < ApplicationRecord
     end
 
     def update_wiki
-      if persisted? && saved_change_to_attribute?(:name) && attribute_before_last_save(:name).present? && WikiPage.titled(attribute_before_last_save(:name)).exists?
+      if persisted? && saved_change_to_name? && attribute_before_last_save("name").present? && WikiPage.titled(attribute_before_last_save("name")).exists?
         # we're renaming the artist, so rename the corresponding wiki page
-        old_page = WikiPage.titled(attribute_before_last_save(:name)).first
+        old_page = WikiPage.titled(attribute_before_last_save("name")).first
 
         if wiki_page.present?
           # a wiki page with the new name already exists, so update the content
@@ -378,7 +379,7 @@ class Artist < ApplicationRecord
       elsif wiki_page.nil?
         # if there are any notes, we need to create a new wiki page
         if @notes.present?
-          create_wiki_page(body: @notes, title: name)
+          wp = create_wiki_page(body: @notes, title: name)
         end
       elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
         # if anything changed, we need to update the wiki page

@@ -71,6 +71,13 @@ class ActionDispatch::IntegrationTest
     method_authenticated(:delete, url, user, options)
   end
 
+  def create(factory_bot_model, params = {})
+    record = FactoryBot.build(factory_bot_model, params)
+    record.save
+    raise ActiveRecord::RecordInvalid.new(record) if record.errors.any?
+    record
+  end
+
   def setup
     super
     Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)

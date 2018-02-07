@@ -3,11 +3,9 @@ class WikiPage < ApplicationRecord
 
   before_save :normalize_title
   before_save :normalize_other_names
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   after_save :create_version
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
@@ -133,7 +131,7 @@ class WikiPage < ApplicationRecord
   end
 
   def validate_rename
-    return if !title_changed? || skip_secondary_validations
+    return if !saved_change_to_attribute?(:title) || skip_secondary_validations
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
     if tag_was.present? && tag_was.post_count > 0
@@ -170,10 +168,6 @@ class WikiPage < ApplicationRecord
     @skip_secondary_validations = (value == true || value == "1")
   end
 
-  def creator_name
-    User.id_to_name(creator_id)
-  end
-
   def category_name
     Tag.category_for(title)
   end
@@ -183,7 +177,7 @@ class WikiPage < ApplicationRecord
   end
 
   def wiki_page_changed?
-    title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+    saved_change_to_attribute?(:title) || saved_change_to_attribute?(:body) || saved_change_to_attribute?(:is_locked) || saved_change_to_attribute?(:is_deleted) || saved_change_to_attribute?(:other_names)
   end
 
   def merge_version
@@ -221,20 +215,6 @@ class WikiPage < ApplicationRecord
       else
         create_new_version
       end
-    end
-  end
-  
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.user.id
-  end
-
-  def initialize_updater
-    if wiki_page_changed?
-      self.updater_id = CurrentUser.user.id
     end
   end
 

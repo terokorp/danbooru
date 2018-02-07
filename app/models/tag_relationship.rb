@@ -3,10 +3,10 @@ class TagRelationship < ApplicationRecord
 
   attr_accessor :skip_secondary_validations
 
-  belongs_to :creator, :class_name => "User"
-  belongs_to :approver, :class_name => "User"
-  belongs_to :forum_post
-  belongs_to :forum_topic
+  belongs_to_creator
+  belongs_to :approver, class_name: "User", optional: true
+  belongs_to :forum_post, optional: true
+  belongs_to :forum_topic, optional: true
   has_one :antecedent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "antecedent_name"
   has_one :consequent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "consequent_name"
 

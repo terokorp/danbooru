@@ -15,6 +15,10 @@ class CurrentUser
     end
   end
 
+  def self.as(user, &block)
+    scoped(user, &block)
+  end
+
   def self.as_admin(&block)
     if block_given?
       scoped(User.admins.first, "127.0.0.1", &block)
