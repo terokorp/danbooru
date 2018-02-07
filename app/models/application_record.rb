@@ -143,6 +143,7 @@ class ApplicationRecord < ActiveRecord::Base
             if rec.creator_id.nil?
               rec.creator_id = CurrentUser.id
               rec.creator_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:creator_ip_addr=)
+              rec.ip_addr = CurrentUser.ip_addr if rec.respond_to?(:ip_addr=)
             end
           end
 

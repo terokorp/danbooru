@@ -4,9 +4,9 @@ class CommentsController < ApplicationController
   skip_before_action :api_check
 
   def index
-    if params[:group_by] == "comment" || request.format == Mime::ATOM
+    if params[:group_by] == "comment" || request.format == Mime::Type.lookup("application/atom+xml")
       index_by_comment
-    elsif request.format == Mime::JS
+    elsif request.format == Mime::Type.lookup("text/javascript")
       index_for_post
     else
       index_by_post
@@ -31,7 +31,9 @@ class CommentsController < ApplicationController
     @comment = Comment.create(comment_params(:create))
     respond_with(@comment) do |format|
       format.html do
-        if @comment.errors.any?
+        if @comment.post.nil?
+          redirect_to comments_path, notice: @comment.errors.full_messages.join("; ")
+        elsif @comment.errors.any?
           redirect_to post_path(@comment.post), :notice => @comment.errors.full_messages.join("; ")
         else
           redirect_to post_path(@comment.post), :notice => "Comment posted"

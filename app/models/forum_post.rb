@@ -2,11 +2,9 @@ class ForumPost < ApplicationRecord
   include Mentionable
 
   attr_readonly :topic_id
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
@@ -208,14 +206,6 @@ class ForumPost < ApplicationRecord
       ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
       topic.response_count -= 1
     end
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
   end
 
   def initialize_is_deleted

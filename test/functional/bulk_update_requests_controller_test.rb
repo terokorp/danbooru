@@ -1,15 +1,15 @@
 require 'test_helper'
 
-class BulkUpdateRequestsControllerTest < ActionController::TestCase
+class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
   context "BulkUpdateRequestsController" do
     setup do
-      @user = FactoryBot.create(:user)
-      @admin = FactoryBot.create(:admin_user)
+      @user = create(:user)
+      @admin = create(:admin_user)
     end
 
     context "#new" do
       should "render" do
-        get :new, {}, {:user_id => @user.id}
+        get_authenticated bulk_update_requests_path, @user
         assert_response :success
       end
     end
@@ -17,26 +17,26 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#create" do
       should "succeed" do
         assert_difference("BulkUpdateRequest.count", 1) do
-          post :create, {:bulk_update_request => {:skip_secondary_validations => "1", :script => "create alias aaa -> bbb", :title => "xxx"}}, {:user_id => @user.id}
+          post_authenticated bulk_update_requests_path, @user, params: {bulk_update_request: {skip_secondary_validations: "1", script: "create alias aaa -> bbb", title: "xxx"}}
         end
       end
     end
 
     context "#update" do
       setup do
-        CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryBot.create(:bulk_update_request)
+        CurrentUser.as(@user) do
+          @bulk_update_request = create(:bulk_update_request)
         end
       end
 
       should "still handle enabled secondary validations correctly" do
-        post :update, {:id => @bulk_update_request.id, :bulk_update_request => {:script => "create alias zzz -> 222", :skip_secondary_validations => "0"}}, {:user_id => @user.id}
+        put_authenticated bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222", skip_secondary_validations: "0"}}
         @bulk_update_request.reload
         assert_equal("create alias zzz -> 222", @bulk_update_request.script)
       end
 
       should "still handle disabled secondary validations correctly" do
-        post :update, {:id => @bulk_update_request.id, :bulk_update_request => {:script => "create alias zzz -> 222", :skip_secondary_validations => "1"}}, {:user_id => @user.id}
+        put_authenticated bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222", skip_secondary_validations: "1"}}
         @bulk_update_request.reload
         assert_equal("create alias zzz -> 222", @bulk_update_request.script)
       end
@@ -44,27 +44,27 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
     context "#index" do
       setup do
-        CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryBot.create(:bulk_update_request)
+        CurrentUser.as(@user) do
+          @bulk_update_request = create(:bulk_update_request)
         end
       end
 
       should "render" do
-        get :index, {}, {:user_id => @user.id}
+        get bulk_update_requests_path
         assert_response :success
       end
     end
 
     context "#destroy" do
       setup do
-        CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryBot.create(:bulk_update_request)
+        CurrentUser.as(@user) do
+          @bulk_update_request = create(:bulk_update_request)
         end
       end
 
       context "for the creator" do
         should "succeed" do
-          delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @user.id}
+          delete_authenticated bulk_update_request_path(@bulk_update_request), @user
           @bulk_update_request.reload
           assert_equal("rejected", @bulk_update_request.status)
         end
@@ -72,19 +72,19 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
       context "for another member" do
         setup do
-          @another_user = FactoryBot.create(:user)
+          @another_user = create(:user)
         end
 
         should "fail" do
           assert_difference("BulkUpdateRequest.count", 0) do
-            delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @another_user.id}
+            delete_authenticated bulk_update_request_path(@bulk_update_request), @another_user
           end
         end
       end
 
       context "for an admin" do
         should "succeed" do
-          delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @admin.id}
+          delete_authenticated bulk_update_request_path(@bulk_update_request), @admin
           @bulk_update_request.reload
           assert_equal("rejected", @bulk_update_request.status)
         end
@@ -93,14 +93,14 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
     context "#approve" do
       setup do
-        CurrentUser.scoped(@user) do
-          @bulk_update_request = FactoryBot.create(:bulk_update_request)
+        CurrentUser.as(@user) do
+          @bulk_update_request = create(:bulk_update_request)
         end
       end
 
       context "for a member" do
         should "fail" do
-          post :approve, {:id => @bulk_update_request.id}, {:user_id => @user.id}
+          post_authenticated approve_bulk_update_request_path(@bulk_update_request), @user
           @bulk_update_request.reload
           assert_equal("pending", @bulk_update_request.status)
         end
@@ -108,7 +108,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
       context "for an admin" do
         should "succeed" do
-          post :approve, {:id => @bulk_update_request.id}, {:user_id => @admin.id}
+          post_authenticated approve_bulk_update_request_path(@bulk_update_request), @admin
           @bulk_update_request.reload
           assert_equal("approved", @bulk_update_request.status)
         end

@@ -11,13 +11,11 @@ class ForumTopic < ApplicationRecord
     Admin: User::Levels::ADMIN,
   }
 
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   has_many :posts, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
-  has_one :original_post, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id"
+  has_one :original_post, lambda {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :subscriptions, :class_name => "ForumSubscription"
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title, :creator_id
   validates_associated :original_post
@@ -169,14 +167,6 @@ class ForumTopic < ApplicationRecord
 
   def initialize_is_deleted
     self.is_deleted = false if is_deleted.nil?
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
   end
 
   def page_for(post_id)
