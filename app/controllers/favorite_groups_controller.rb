@@ -78,6 +78,6 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def favgroup_params
-    params.require(:favorite_group).permit(%i[name post_ids is_public])
+    params.fetch(:favorite_group, {}).permit(%i[name post_ids is_public])
   end
 end
