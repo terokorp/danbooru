@@ -66,9 +66,10 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
           @post = FactoryBot.create(:post)
         end
 
-        put add_post_favorite_group_path(@favgroup), @user, params: {post_id: post.id, format: "js"}
+        put_authenticated add_post_favorite_group_path(@favgroup), @user, params: {post_id: @post.id, format: "js"}
         assert_response :success
-        assert_equal([post.id], favgroup.reload.post_id_array)
+        @favgroup.reload
+        assert_equal([@post.id], @favgroup.post_id_array)
       end
     end
   end
