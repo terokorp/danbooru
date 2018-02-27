@@ -1,5 +1,5 @@
 class IpBansController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_action :moderator_only
 
   def new
@@ -12,7 +12,7 @@ class IpBansController < ApplicationController
   end
 
   def index
-    @search = IpBan.search(params[:search])
+    @search = IpBan.search(search_params)
     @ip_bans = @search.paginate(params[:page], :limit => params[:limit])
     respond_with(@ip_bans)
   end
@@ -26,6 +26,10 @@ class IpBansController < ApplicationController
   private
 
   def ip_ban_params
-    params.require(:ip_ban).permit(%i[ip_addr reason])
+    params.fetch(:ip_ban, {}).permit(%i[ip_addr reason])
+  end
+
+  def search_params
+    params.fetch(:search, {}).permit(%i[ip_addr order])
   end
 end
