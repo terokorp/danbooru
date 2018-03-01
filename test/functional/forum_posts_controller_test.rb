@@ -1,79 +1,71 @@
 require 'test_helper'
 
-class ForumPostsControllerTest < ActionController::TestCase
+class ForumPostsControllerTest < ActionDispatch::IntegrationTest
   context "The forum posts controller" do
     setup do
-      @user = FactoryBot.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = FactoryBot.create(:user)
-      @mod = FactoryBot.create(:moderator_user)
-      @forum_topic = FactoryBot.create(:forum_topic, :title => "my forum topic", :creator => @user)
-      @forum_post = FactoryBot.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
+      @other_user = create(:user)
+      @mod = create(:moderator_user)
+      @forum_topic = create(:forum_topic, :title => "my forum topic", :creator => @user)
+      @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
     end
 
     context "index action" do
       should "list all forum posts" do
-        get :index
+        get forum_posts_path
         assert_response :success
       end
 
       context "with search conditions" do
         should "list all matching forum posts" do
-          get :index, {:search => {:body_matches => "xxx"}}
+          get forum_posts_path, params: {:search => {:body_matches => "xxx"}}
           assert_response :success
-          assert_equal(1, assigns(:forum_posts).size)
+          assert_select "#forum_post_#{@forum_post.id}"
         end
 
         should "list nothing for when the search matches nothing" do
-          get :index, {:search => {:body_matches => "bababa"}}
+          get forum_posts_path, params: {:search => {:body_matches => "bababa"}}
           assert_response :success
-          assert_equal(0, assigns(:forum_posts).size)
+          assert_select "#forum_post_#{@forum_post.id}", false
         end
 
         should "list by creator id" do
-          get :index, {:search => {:creator_id => @user.id}}
-          assert_response :success
-          assert_equal(1, assigns(:forum_posts).size)
+          get forum_posts_path, params: {:search => {:creator_id => @user.id}}
+          assert_select "#forum_post_#{@forum_post.id}"
         end
       end
 
       context "with private topics" do
         setup do
-          CurrentUser.user = @mod
-          @mod_topic = FactoryBot.create(:mod_up_forum_topic)
-          @mod_posts = 2.times.map do
-            FactoryBot.create(:forum_post, :topic_id => @mod_topic.id)
+          CurrentUser.as(@mod) do
+            @mod_topic = create(:mod_up_forum_topic)
+            @mod_posts = 2.times.map do
+              create(:forum_post, :topic_id => @mod_topic.id)
+            end
           end
           @mod_post_ids = ([@forum_post] + @mod_posts).map(&:id).reverse
         end
 
         should "list only permitted posts for members" do
-          CurrentUser.user = @user
-          get :index, {}, { :user_id => @user.id }
+          get forum_posts_path
 
           assert_response :success
-          assert_equal([@forum_post.id], assigns(:forum_posts).map(&:id))
+          assert_select "#forum_post_#{@forum_post.id}"
+          assert_select "#forum_post_#{@mod_posts[0].id}", false
         end
 
         should "list only permitted posts for mods" do
-          CurrentUser.user = @mod
-          get :index, {}, { :user_id => @mod.id }
+          get_authenticated forum_posts_path, @mod
 
           assert_response :success
-          assert_equal(@mod_post_ids, assigns(:forum_posts).map(&:id))
+          assert_select "#forum_post_#{mod_posts[0].id}"
         end
       end
     end
 
     context "edit action" do
       should "render if the editor is the creator of the topic" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @user.id}
+        get_authenticated edit_forum_post_path(@forum_post), @user
         assert_response :success
       end
 
