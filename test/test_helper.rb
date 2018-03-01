@@ -46,6 +46,9 @@ class ActiveSupport::TestCase
 end
 
 class ActionDispatch::IntegrationTest
+  include PostArchiveTestHelper
+  include PoolArchiveTestHelper
+
   def method_authenticated(method, url, user, options)
     api_key = ApiKey.generate!(user) unless user.api_key.present?
     self.send(method, url, options.merge(headers: {"HTTP_AUTHORIZATION" => build_authorization_string(user, api_key)}))

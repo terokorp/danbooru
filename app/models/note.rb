@@ -3,11 +3,9 @@ class Note < ApplicationRecord
 
   attr_accessor :updater_id, :updater_ip_addr, :html_id
   belongs_to :post
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   has_many :versions, lambda {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height, :body
   validate :post_must_exist
   validate :note_within_image
@@ -86,15 +84,6 @@ class Note < ApplicationRecord
   extend SearchMethods
   include ApiMethods
 
-  def initialize_creator
-    self.creator_id ||= CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
-    self.updater_ip_addr = CurrentUser.ip_addr
-  end
-
   def post_must_exist
     if !Post.exists?(post_id)
       errors.add :post, "must exist"
@@ -119,10 +108,6 @@ class Note < ApplicationRecord
 
   def is_locked?
     Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
-  end
-
-  def creator_name
-    User.id_to_name(creator_id)
   end
 
   def rescale!(x_scale, y_scale)
