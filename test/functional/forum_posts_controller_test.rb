@@ -6,8 +6,10 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
       @other_user = create(:user)
       @mod = create(:moderator_user)
-      @forum_topic = create(:forum_topic, :title => "my forum topic", :creator => @user)
-      @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+      CurrentUser.scoped(@user) do
+        @forum_topic = create(:forum_topic, :title => "my forum topic")
+        @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+      end
     end
 
     context "index action" do
@@ -20,18 +22,19 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         should "list all matching forum posts" do
           get forum_posts_path, params: {:search => {:body_matches => "xxx"}}
           assert_response :success
-          assert_select "#forum_post_#{@forum_post.id}"
+          assert_select "#forum-post-#{@forum_post.id}"
         end
 
         should "list nothing for when the search matches nothing" do
           get forum_posts_path, params: {:search => {:body_matches => "bababa"}}
           assert_response :success
-          assert_select "#forum_post_#{@forum_post.id}", false
+          assert_select "#forum-post-#{@forum_post.id}", false
         end
 
         should "list by creator id" do
           get forum_posts_path, params: {:search => {:creator_id => @user.id}}
-          assert_select "#forum_post_#{@forum_post.id}"
+          assert_response :success
+          assert_select "#forum-post-#{@forum_post.id}"
         end
       end
 
@@ -50,15 +53,15 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
           get forum_posts_path
 
           assert_response :success
-          assert_select "#forum_post_#{@forum_post.id}"
-          assert_select "#forum_post_#{@mod_posts[0].id}", false
+          assert_select "#forum-post-#{@forum_post.id}"
+          assert_select "#forum-post-#{@mod_posts[0].id}", false
         end
 
         should "list only permitted posts for mods" do
           get_authenticated forum_posts_path, @mod
 
           assert_response :success
-          assert_select "#forum_post_#{mod_posts[0].id}"
+          assert_select "#forum-post-#{@mod_posts[0].id}"
         end
       end
     end
@@ -70,19 +73,19 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render if the editor is a moderator" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @mod.id}
+        get_authenticated edit_forum_post_path(@forum_post), @mod
         assert_response :success
       end
 
       should "fail if the editor is not the creator of the topic and is not a moderator" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @other_user.id}
+        get_authenticated edit_forum_post_path(@forum_post), @other_user
         assert_response(403)
       end
     end
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id, :topic_id => @forum_topic.id}, {:user_id => @user.id}
+        get_authenticated new_forum_post_path, @user, params: {:topic_id => @forum_topic.id}
         assert_response :success
       end
     end
@@ -90,7 +93,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
-          post :create, {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}, {:user_id => @user.id}
+          post_authenticated forum_posts_path, @user, params: {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}
         end
 
         forum_post = ForumPost.last
@@ -100,8 +103,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "destroy the posts" do
-        CurrentUser.user = @mod
-        post :destroy, {:id => @forum_post.id}, {:user_id => @mod.id}
+        delete_authenticated forum_post_path(@forum_post), @mod
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(true, @forum_post.is_deleted?)
@@ -110,12 +112,13 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "undelete action" do
       setup do
-        @forum_post.update_attribute(:is_deleted, true)
+        CurrentUser.as(@mod) do
+          @forum_post.update(is_deleted: true)
+        end
       end
 
       should "restore the post" do
-        CurrentUser.user = @mod
-        post :undelete, {:id => @forum_post.id}, {:user_id => @mod.id}
+        post_authenticated undelete_forum_post_path(@forum_post), @mod
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(false, @forum_post.is_deleted?)

@@ -1,7 +1,9 @@
 class Note < ApplicationRecord
   class RevertError < Exception ; end
 
-  attr_accessor :updater_id, :updater_ip_addr, :html_id
+  attribute :updater_id, :integer
+  attribute :updater_ip_addr, :inet
+  attr_accessor :html_id
   belongs_to :post
   belongs_to_creator
   belongs_to_updater
@@ -119,7 +121,7 @@ class Note < ApplicationRecord
   end
 
   def update_post
-    if self.changed?
+    if self.saved_changes?
       if Note.where(:is_active => true, :post_id => post_id).exists?
         execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
       else
@@ -141,7 +143,7 @@ class Note < ApplicationRecord
   end
 
   def versioned_attributes_changed?
-    new_record? || x_changed? || y_changed? || width_changed? || height_changed? || is_active_changed? || body_changed?
+    new_record? || saved_change_to_x? || saved_change_to_y? || saved_change_to_width? || saved_change_to_height? || saved_change_to_is_active? || saved_change_to_body?
   end
 
   def create_new_version

@@ -64,7 +64,7 @@ end
 
 group :development, :test do
   gem 'awesome_print'
-  gem 'pry-byebug'
+  # gem 'pry-byebug'
   gem 'ruby-prof'
   gem 'listen'
 end

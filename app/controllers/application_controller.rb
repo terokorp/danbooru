@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   helper_method :show_moderation_notice?
   before_action :enable_cors
 
-  #rescue_from Exception, :with => :rescue_exception
+  # rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
