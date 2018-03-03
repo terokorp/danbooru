@@ -175,7 +175,7 @@ class Note < ApplicationRecord
 
   def merge_version?
     prev = versions.last
-    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago && !is_active_changed?
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago && !saved_change_to_is_active?
   end
 
   def revert_to(version)

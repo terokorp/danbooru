@@ -3,18 +3,18 @@ require 'ostruct'
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
-  validates_uniqueness_of :name, :case_sensitive => false, :if => :name_changed?
-  validate :validate_name, :if => :name_changed?
+  attribute :updater_id, :integer
+  validates_uniqueness_of :name, :case_sensitive => false, :if => :saved_change_to_name?
+  validate :validate_name, :if => :saved_change_to_name?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
-  before_validation :initialize_creator, :on => :create
   after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
   after_create :synchronize!
@@ -161,10 +161,6 @@ class Pool < ApplicationRecord
     self.is_active = true if is_active.nil?
   end
 
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
   def normalize_name
     self.name = Pool.normalize_name(name)
   end
@@ -294,7 +290,7 @@ class Pool < ApplicationRecord
 
   def synchronize!
     synchronize
-    save if post_ids_changed?
+    save if saved_change_to_post_ids?
   end
 
   def post_id_array
@@ -359,7 +355,7 @@ class Pool < ApplicationRecord
   end
 
   def update_category_pseudo_tags_for_posts_async
-    if category_changed?
+    if saved_change_to_category?
       delay(:queue => "default").update_category_pseudo_tags_for_posts
     end
   end
@@ -377,7 +373,7 @@ class Pool < ApplicationRecord
   end
 
   def updater_can_change_category
-    if category_changed? && !category_changeable_by?(CurrentUser.user)
+    if saved_change_to_category? && !category_changeable_by?(CurrentUser.user)
       errors[:base] << "You cannot change the category of pools with greater than 100 posts"
       false
     else
