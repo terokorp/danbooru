@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Moderator
-  class IpAddrsControllerTest < ActionController::TestCase
+  class IpAddrsControllerTest < ActionDispatch::IntegrationTest
     context "The ip addrs controller" do
       setup do
         PoolArchive.delete_all
@@ -19,17 +19,17 @@ module Moderator
       end
 
       should "find by ip addr" do
-        get :index, {:search => {:ip_addr => "127.0.0.1"}}, {:user_id => @user.id}
+        get_authenticated :index:_path, @user, params: {:search => {:ip_addr => "127.0.0.1"}}
         assert_response :success
       end
 
       should "find by user id" do
-        get :index, {:search => {:user_id => @user.id.to_s}}, {:user_id => @user.id}
+        get_authenticated :index:_path, @user, params: {:search => {:user_id => @user.id.to_s}}
         assert_response :success
       end
 
       should "find by user name" do
-        get :index, {:search => {:user_name => @user.name}}, {:user_id => @user.id}
+        get_authenticated :index:_path, @user, params: {:search => {:user_name => @user.name}}
         assert_response :success
       end
 

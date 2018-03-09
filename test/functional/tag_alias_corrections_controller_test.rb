@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TagAliasCorrectionsControllerTest < ActionController::TestCase
+class TagAliasCorrectionsControllerTest < ActionDispatch::IntegrationTest
   context "The tag alias correction controller" do
     setup do
       @admin = FactoryBot.create(:admin_user)
@@ -16,14 +16,14 @@ class TagAliasCorrectionsControllerTest < ActionController::TestCase
 
     context "show action" do
       should "render" do
-        get :show, {:tag_alias_id => @tag_alias.id}, {:user_id => @admin.id}
+        get_authenticated :show:_path, @admin, params: {:tag_alias_id => @tag_alias.id}
         assert_response :success
       end
     end
 
     context "create action" do
       should "render" do
-        post :create, {:tag_alias_id => @tag_alias.id, :commit => "Fix"}, {:user_id => @admin.id}
+        post_authenticated :create:_path, @admin, params: {:tag_alias_id => @tag_alias.id, :commit => "Fix"}
         assert_redirected_to(tag_alias_correction_path(:tag_alias_id => @tag_alias.id))
       end
     end

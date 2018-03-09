@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SourcesControllerTest < ActionController::TestCase
+class SourcesControllerTest < ActionDispatch::IntegrationTest
   context "The sources controller" do
     context "show action" do
       should "work for a pixiv URL" do

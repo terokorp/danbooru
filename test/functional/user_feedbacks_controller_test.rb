@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserFeedbacksControllerTest < ActionController::TestCase
+class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
   context "The user feedbacks controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -17,7 +17,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, { user_feedback: { user_id: @user.id } }, { user_id: @critic.id }
+        get_authenticated :new:_path, @critic, params: { user_feedback: { user_id: @user.id } }
         assert_response :success
       end
     end
@@ -28,7 +28,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
       end
 
       should "render" do
-        get :edit, {:id => @user_feedback.id}, {:user_id => @critic.id}
+        get_authenticated :edit:_path, @critic, params: {:id => @user_feedback.id}
         assert_response :success
       end
     end
@@ -45,7 +45,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:user_id => @user.id}}, {:user_id => @critic.id}
+          get_authenticated :index:_path, @critic, params: {:search => {:user_id => @user.id}}
           assert_response :success
         end
       end
@@ -54,7 +54,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new feedback" do
         assert_difference("UserFeedback.count", 1) do
-          post :create, {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}, {:user_id => @critic.id}
+          post_authenticated :create:_path, @critic, params: {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}
           assert_not_nil(assigns(:user_feedback))
           assert_equal([], assigns(:user_feedback).errors.full_messages)
         end
@@ -64,7 +64,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     context "update action" do
       should "update the feedback" do
         @feedback = FactoryBot.create(:user_feedback, user: @user, category: "negative")
-        put :update, { id: @feedback.id, user_feedback: { category: "positive" }}, { user_id: @critic.id }
+        put_authenticated :update:_path, @critic, params: { id: @feedback.id, user_feedback: { category: "positive" }}
 
         assert_redirected_to(@feedback)
         assert("positive", @feedback.reload.category)
@@ -78,21 +78,21 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
       should "delete a feedback" do
         assert_difference "UserFeedback.count", -1 do
-          post :destroy, {:id => @user_feedback.id}, {:user_id => @critic.id}
+          post_authenticated :destroy:_path, @critic, params: {:id => @user_feedback.id}
         end
       end
 
       context "by a moderator" do
         should "allow deleting feedbacks given to other users" do
           assert_difference "UserFeedback.count", -1 do
-            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+            post_authenticated :destroy:_path, @mod, params: {:id => @user_feedback.id}
           end
         end
 
         should "not allow deleting feedbacks given to themselves" do
           @user_feedback = FactoryBot.create(:user_feedback, user: @mod)
           assert_difference "UserFeedback.count", 0 do
-            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+            post_authenticated :destroy:_path, @mod, params: {:id => @user_feedback.id}
           end
         end
       end

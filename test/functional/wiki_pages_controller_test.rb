@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class WikiPagesControllerTest < ActionController::TestCase
+class WikiPagesControllerTest < ActionDispatch::IntegrationTest
   context "The wiki pages controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -80,7 +80,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, { wiki_page: { title: "test" }}, { user_id: @mod.id }
+        get_authenticated :new:_path, @mod, params: { wiki_page: { title: "test" }}
         assert_response :success
       end
     end
@@ -89,7 +89,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       should "render" do
         wiki_page = FactoryBot.create(:wiki_page)
 
-        get :edit, { id: wiki_page.id }, { user_id: @mod.id }
+        get_authenticated :edit:_path, @mod, params: { id: wiki_page.id }
         assert_response :success
       end
     end
@@ -97,7 +97,7 @@ class WikiPagesControllerTest < ActionController::TestCase
     context "create action" do
       should "create a wiki_page" do
         assert_difference("WikiPage.count", 1) do
-          post :create, {:wiki_page => {:title => "abc", :body => "abc"}}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:wiki_page => {:title => "abc", :body => "abc"}}
         end
       end
     end
@@ -109,25 +109,25 @@ class WikiPagesControllerTest < ActionController::TestCase
       end
 
       should "update a wiki_page" do
-        post :update, {:id => @wiki_page.id, :wiki_page => {:body => "xyz"}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @wiki_page.id, :wiki_page => {:body => "xyz"}}
         @wiki_page.reload
         assert_equal("xyz", @wiki_page.body)
       end
 
       should "not rename a wiki page with a non-empty tag" do
-        post :update, {:id => @wiki_page.id, :wiki_page => {:title => "bar"}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @wiki_page.id, :wiki_page => {:title => "bar"}}
 
         assert_equal("foo", @wiki_page.reload.title)
       end
 
       should "rename a wiki page with a non-empty tag if secondary validations are skipped" do
-        post :update, {:id => @wiki_page.id, :wiki_page => {:title => "bar", :skip_secondary_validations => "1"}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @wiki_page.id, :wiki_page => {:title => "bar", :skip_secondary_validations => "1"}}
 
         assert_equal("bar", @wiki_page.reload.title)
       end
 
       should "not allow non-Builders to delete wiki pages" do
-        put :update, { id: @wiki_page.id, wiki_page: { is_deleted: true }}, { user_id: @user.id }
+        put_authenticated :update:_path, @user, params: { id: @wiki_page.id, wiki_page: { is_deleted: true }}
         assert_equal(false, @wiki_page.reload.is_deleted?)
       end
     end
@@ -140,7 +140,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
       should "destroy a wiki_page" do
         CurrentUser.scoped(@mod) do
-          post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+          post_authenticated :destroy:_path, @mod, params: {:id => @wiki_page.id}
         end
         @wiki_page.reload
         assert_equal(true, @wiki_page.is_deleted?)
@@ -148,7 +148,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
       should "record the deleter" do
         CurrentUser.scoped(@mod) do
-          post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+          post_authenticated :destroy:_path, @mod, params: {:id => @wiki_page.id}
         end
         @wiki_page.reload
         assert_equal(@mod.id, @wiki_page.updater_id)
@@ -169,7 +169,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       should "revert to a previous version" do
         version = @wiki_page.versions(true).first
         assert_equal("1", version.body)
-        post :revert, {:id => @wiki_page.id, :version_id => version.id}, {:user_id => @user.id}
+        post_authenticated :revert:_path, @user, params: {:id => @wiki_page.id, :version_id => version.id}
         @wiki_page.reload
         assert_equal("1", @wiki_page.body)
       end
@@ -177,7 +177,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       should "not allow reverting to a previous version of another wiki page" do
         @wiki_page_2 = FactoryBot.create(:wiki_page)
 
-        post :revert, { :id => @wiki_page.id, :version_id => @wiki_page_2.versions(true).first.id }, {:user_id => @user.id}
+        post_authenticated :revert:_path, @user, params: { :id => @wiki_page.id, :version_id => @wiki_page_2.versions(true).first.id }
         @wiki_page.reload
 
         assert_not_equal(@wiki_page.body, @wiki_page_2.body)

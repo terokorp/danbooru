@@ -47,7 +47,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @bulk_update_requests = BulkUpdateRequest.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@bulk_update_requests)
   end
 

@@ -40,7 +40,7 @@ class LegacyController < ApplicationController
   end
 
   def artists
-    @artists = Artist.limit(100).search(params[:search]).paginate(params[:page])
+    @artists = Artist.limit(100).search(search_params).paginate(params[:page])
   end
 
   def unavailable

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TagsControllerTest < ActionController::TestCase
+class TagsControllerTest < ActionDispatch::IntegrationTest
   context "The tags controller" do
     setup do
       @user = FactoryBot.create(:builder_user)
@@ -17,7 +17,7 @@ class TagsControllerTest < ActionController::TestCase
 
     context "edit action" do
       should "render" do
-        get :edit, {:id => @tag.id}, {:user_id => @user.id}
+        get_authenticated :edit:_path, @user, params: {:id => @tag.id}
         assert_response :success
       end
     end
@@ -64,21 +64,21 @@ class TagsControllerTest < ActionController::TestCase
       end
 
       should "update the tag" do
-        post :update, {:id => @tag.id, :tag => {:category => Tag.categories.general}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @tag.id, :tag => {:category => Tag.categories.general}}
         assert_redirected_to tag_path(@tag)
         assert_equal(Tag.categories.general, @tag.reload.category)
       end
 
       should "lock the tag for a moderator" do
         CurrentUser.user = @mod
-        post :update, { id: @tag.id, tag: { is_locked: true } }, { user_id: @mod.id }
+        post_authenticated :update:_path, @mod, params: { id: @tag.id, tag: { is_locked: true } }
 
         assert_redirected_to @tag
         assert_equal(true, @tag.reload.is_locked)
       end
 
       should "not lock the tag for a user" do
-        post :update, {id: @tag.id, tag: { is_locked: true }}, { user_id: @user.id }
+        post_authenticated :update:_path, @user, params: {id: @tag.id, tag: { is_locked: true }}
 
         assert_equal(false, @tag.reload.is_locked)
       end
@@ -96,7 +96,7 @@ class TagsControllerTest < ActionController::TestCase
         end
 
         should "update the category for a builder" do
-          post :update, {id: @tag.id, tag: { category: Tag.categories.general }}, {user_id: @user.id}
+          post_authenticated :update:_path, @user, params: {id: @tag.id, tag: { category: Tag.categories.general }}
 
           assert_redirected_to @tag
           assert_equal(Tag.categories.general, @tag.reload.category)
@@ -105,7 +105,7 @@ class TagsControllerTest < ActionController::TestCase
 
       should "not change category when the tag is too large to be changed by a builder" do
         @tag.update(category: Tag.categories.general, post_count: 1001)
-        post :update, {:id => @tag.id, :tag => {:category => Tag.categories.artist}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @tag.id, :tag => {:category => Tag.categories.artist}}
 
         assert_response :forbidden
         assert_equal(Tag.categories.general, @tag.reload.category)

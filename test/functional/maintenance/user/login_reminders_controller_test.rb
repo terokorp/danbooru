@@ -2,7 +2,7 @@ require "test_helper"
 
 module Maintenance
   module User
-    class LoginRemindersControllerTest < ActionController::TestCase
+    class LoginRemindersControllerTest < ActionDispatch::IntegrationTest
       context "A login reminder controller" do
         setup do
           @user = FactoryGirl.create(:user)

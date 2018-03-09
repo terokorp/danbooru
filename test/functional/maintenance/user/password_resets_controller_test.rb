@@ -2,7 +2,7 @@ require "test_helper"
 
 module Maintenance
   module User
-    class PasswordResetsControllerTest < ActionController::TestCase
+    class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       context "A password resets controller" do
         setup do
           @user = FactoryGirl.create(:user, :email => "abc@com.net")

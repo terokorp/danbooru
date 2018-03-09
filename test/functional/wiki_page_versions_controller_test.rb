@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class WikiPageVersionsControllerTest < ActionController::TestCase
+class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The wiki page versions controller" do
     setup do
       @user = FactoryBot.create(:user)

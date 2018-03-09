@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Admin::UsersControllerTest < ActionController::TestCase
+class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   context "Admin::UsersController" do
     setup do
       @mod = FactoryBot.create(:moderator_user)
@@ -12,7 +12,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
     context "#edit" do
       should "render" do
-        get :edit, {:id => @user.id}, {:user_id => @mod.id}
+        get_authenticated :edit:_path, @mod, params: {:id => @user.id}
         assert_response :success
       end
     end
@@ -20,7 +20,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
     context "#update" do
       context "on a basic user" do
         should "succeed" do
-          put :update, {:id => @user.id, :user => {:level => "30"}}, {:user_id => @mod.id}
+          put_authenticated :update:_path, @mod, params: {:id => @user.id, :user => {:level => "30"}}
           assert_redirected_to(edit_admin_user_path(@user))
           @user.reload
           assert_equal(30, @user.level)
@@ -29,7 +29,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
         context "promoted to an admin" do
           should "fail" do
-            put :update, {:id => @user.id, :user => {:level => "50"}}, {:user_id => @mod.id}
+            put_authenticated :update:_path, @mod, params: {:id => @user.id, :user => {:level => "50"}}
             assert_response(403)
             @user.reload
             assert_equal(20, @user.level)
@@ -39,7 +39,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
       context "on an admin user" do
         should "fail" do
-          put :update, {:id => @admin.id, :user => {:level => "30"}}, {:user_id => @mod.id}
+          put_authenticated :update:_path, @mod, params: {:id => @admin.id, :user => {:level => "30"}}
           assert_response(403)
           @admin.reload
           assert_equal(50, @admin.level)

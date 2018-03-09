@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Moderator
   module Post
-    class DisapprovalsControllerTest < ActionController::TestCase
+    class DisapprovalsControllerTest < ActionDispatch::IntegrationTest
       context "The moderator post disapprovals controller" do
         setup do
           @admin = FactoryGirl.create(:admin_user)
@@ -15,7 +15,7 @@ module Moderator
         context "create action" do
           should "render" do
             assert_difference("PostDisapproval.count", 1) do
-              post :create, { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }, { user_id: @admin.id }
+              post_authenticated :create:_path, @admin, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }
             end
             assert_response :success
           end

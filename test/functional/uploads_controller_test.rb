@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UploadsControllerTest < ActionController::TestCase
+class UploadsControllerTest < ActionDispatch::IntegrationTest
   def setup
     super
     mock_iqdb_service!
@@ -21,14 +21,14 @@ class UploadsControllerTest < ActionController::TestCase
     context "batch action" do
       context "for twitter galleries" do
         should "render" do
-          get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
+          get_authenticated :batch:_path, @user, params: {:url => "https://twitter.com/lvlln/status/567054278486151168"}
           assert_response :success
         end
       end
 
       context "for pixiv ugoira galleries" do
         should "render" do
-          get :batch, {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}, {:user_id => @user.id}
+          get_authenticated :batch:_path, @user, params: {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}
           assert_response :success
           assert_no_match(/59523577_ugoira0\.jpg/, response.body)
         end
@@ -43,7 +43,7 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "for a twitter post" do
         setup do
-          get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
+          get_authenticated :new:_path, @user, params: {:url => "https://twitter.com/frappuccino/status/566030116182949888"}
         end
 
         should "render" do
@@ -57,7 +57,7 @@ class UploadsControllerTest < ActionController::TestCase
         end
 
         should "initialize the post" do
-          get :new, {:url => "aaa"}, {:user_id => @user.id}
+          get_authenticated :new:_path, @user, params: {:url => "aaa"}
           assert_response :success
           assert_not_nil(assigns(:post))
         end
@@ -76,7 +76,7 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:source => @upload.source}}, {:user_id => @user.id}
+          get_authenticated :index:_path, @user, params: {:search => {:source => @upload.source}}
           assert_response :success
         end
       end
@@ -88,7 +88,7 @@ class UploadsControllerTest < ActionController::TestCase
       end
 
       should "render" do
-        get :show, {:id => @upload.id}, {:user_id => @user.id}
+        get_authenticated :show:_path, @user, params: {:id => @upload.id}
         assert_response :success
       end
     end
@@ -98,7 +98,7 @@ class UploadsControllerTest < ActionController::TestCase
         assert_difference("Upload.count", 1) do
           file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
           file.stubs(:tempfile).returns(file)
-          post :create, {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}
         end
       end
     end
@@ -109,7 +109,7 @@ class UploadsControllerTest < ActionController::TestCase
       end
 
       should "process an unapproval" do
-        post :update, {:id => @upload.id}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @upload.id}
         @upload.reload
         assert_equal("completed", @upload.status)
       end

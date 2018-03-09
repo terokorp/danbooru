@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Moderator
   module Post
-    class QueuesControllerTest < ActionController::TestCase
+    class QueuesControllerTest < ActionDispatch::IntegrationTest
       context "The moderator post queues controller" do
         setup do
           @admin = FactoryGirl.create(:admin_user)

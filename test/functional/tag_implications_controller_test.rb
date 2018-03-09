@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TagImplicationsControllerTest < ActionController::TestCase
+class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
   context "The tag implications controller" do
     setup do
       @user = FactoryBot.create(:admin_user)
@@ -36,13 +36,13 @@ class TagImplicationsControllerTest < ActionController::TestCase
         end
 
         should "succeed" do
-          post :update, {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}
           @tag_implication.reload
           assert_equal("xxx", @tag_implication.antecedent_name)
         end
 
         should "not allow changing the status" do
-          post :update, {:id => @tag_implication.id, :tag_implication => {:status => "active"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_implication.id, :tag_implication => {:status => "active"}}
           @tag_implication.reload
           assert_equal("pending", @tag_implication.status)
         end
@@ -57,7 +57,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
         end
 
         should "fail" do
-          post :update, {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}
           @tag_implication.reload
           assert_equal("aaa", @tag_implication.antecedent_name)
         end
@@ -91,7 +91,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
 
       should "destroy a tag_implication" do
         assert_difference("TagImplication.count", -1) do
-          post :destroy, {:id => @tag_implication.id}, {:user_id => @user.id}
+          post_authenticated :destroy:_path, @user, params: {:id => @tag_implication.id}
         end
       end
     end

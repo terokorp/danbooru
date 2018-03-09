@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ReportsControllerTest < ActionController::TestCase
+class ReportsControllerTest < ActionDispatch::IntegrationTest
   def setup
     super
 

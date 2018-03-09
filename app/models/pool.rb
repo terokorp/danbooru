@@ -290,7 +290,7 @@ class Pool < ApplicationRecord
 
   def synchronize!
     synchronize
-    save if saved_change_to_post_ids?
+    save if will_save_change_to_post_ids?
   end
 
   def post_id_array
@@ -303,7 +303,7 @@ class Pool < ApplicationRecord
   end
 
   def post_id_array_was
-    @post_id_array_was ||= post_ids_was.scan(/\d+/).map(&:to_i)
+    @post_id_array_was ||= post_ids_before_last_save.to_s.scan(/\d+/).map(&:to_i)
   end
 
   def clear_post_id_array

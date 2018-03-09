@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Moderator
   module Post
-    class ApprovalsControllerTest < ActionController::TestCase
+    class ApprovalsControllerTest < ActionDispatch::IntegrationTest
       context "The moderator post approvals controller" do
         setup do
           @admin = FactoryGirl.create(:admin_user)
@@ -14,7 +14,7 @@ module Moderator
 
         context "create action" do
           should "render" do
-            post :create, {:post_id => @post.id, :format => "js"}, {:user_id => @admin.id}
+            post_authenticated :create:_path, @admin, params: {:post_id => @post.id, :format => "js"}
             assert_response :success
             @post.reload
             assert(!@post.is_pending?)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SessionsControllerTest < ActionController::TestCase
+class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do
     setup do
       @user = FactoryBot.create(:user)

@@ -2,7 +2,7 @@ require "test_helper"
 
 module Maintenance
   module User
-    class EmailChangesControllerTest < ActionController::TestCase
+    class EmailChangesControllerTest < ActionDispatch::IntegrationTest
       context "in all cases" do
         setup do
           @user = FactoryGirl.create(:user, :email => "bob@ogres.net")
@@ -20,7 +20,7 @@ module Maintenance
         context "#create" do
           context "with the correct password" do
             should "work" do
-              post :create, {:email_change => {:password => "password", :email => "abc@ogres.net"}}, {:user_id => @user.id}
+              post_authenticated :create:_path, @user, params: {:email_change => {:password => "password", :email => "abc@ogres.net"}}
               assert_redirected_to(edit_user_path(@user))
               @user.reload
               assert_equal("abc@ogres.net", @user.email)
@@ -29,7 +29,7 @@ module Maintenance
 
           context "with the incorrect password" do
             should "not work" do
-              post :create, {:email_change => {:password => "passwordx", :email => "abc@ogres.net"}}, {:user_id => @user.id}
+              post_authenticated :create:_path, @user, params: {:email_change => {:password => "passwordx", :email => "abc@ogres.net"}}
               @user.reload
               assert_equal("bob@ogres.net", @user.email)
             end

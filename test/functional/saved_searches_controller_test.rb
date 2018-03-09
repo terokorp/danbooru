@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SavedSearchesControllerTest < ActionController::TestCase
+class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
   context "The saved searches controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -18,12 +18,12 @@ class SavedSearchesControllerTest < ActionController::TestCase
 
     context "create action" do
       should "render" do
-        post :create, { saved_search: { query: "bkub", label_string: "artist" }}, { user_id: @user.id }
+        post_authenticated :create:_path, @user, params: { saved_search: { query: "bkub", label_string: "artist" }}
         assert_response :redirect
       end
 
       should "disable labels when the disable_labels param is given" do
-        post :create, { saved_search: { query: "bkub", disable_labels: "1" }}, { user_id: @user.id }
+        post_authenticated :create:_path, @user, params: { saved_search: { query: "bkub", disable_labels: "1" }}
         assert_equal(true, @user.reload.disable_categorized_saved_searches)
       end
     end
@@ -32,7 +32,7 @@ class SavedSearchesControllerTest < ActionController::TestCase
       should "render" do
         saved_search = FactoryBot.create(:saved_search, user: @user)
 
-        get :edit, { id: saved_search.id }, { user_id: @user.id }
+        get_authenticated :edit:_path, @user, params: { id: saved_search.id }
         assert_response :success
       end
     end
@@ -52,7 +52,7 @@ class SavedSearchesControllerTest < ActionController::TestCase
       should "render" do
         saved_search = FactoryBot.create(:saved_search, user: @user)
 
-        delete :destroy, { id: saved_search.id }, { user_id: @user.id }
+        delete_authenticated :destroy:_path, @user, params: { id: saved_search.id }
         assert_redirected_to saved_searches_path
       end
     end

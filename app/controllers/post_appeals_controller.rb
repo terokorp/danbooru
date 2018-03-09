@@ -8,7 +8,7 @@ class PostAppealsController < ApplicationController
   end
 
   def index
-    @post_appeals = PostAppeal.includes(:creator).search(params[:search]).includes(post: [:appeals, :uploader, :approver])
+    @post_appeals = PostAppeal.includes(:creator).search(search_params).includes(post: [:appeals, :uploader, :approver])
     @post_appeals = @post_appeals.paginate(params[:page], limit: params[:limit])
     respond_with(@post_appeals) do |format|
       format.xml do
@@ -30,6 +30,6 @@ class PostAppealsController < ApplicationController
   private
 
   def post_appeal_params
-    params.require(:post_appeal).permit(%i[post_id reason])
+    params.fetch(:post_appeal, {}).permit(%i[post_id reason])
   end
 end

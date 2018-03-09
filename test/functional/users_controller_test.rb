@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersControllerTest < ActionController::TestCase
+class UsersControllerTest < ActionDispatch::IntegrationTest
   context "The users controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -48,7 +48,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "show hidden attributes to the owner" do
-        get :show, {id: @user.id, format: :json}, {user_id: @user.id}
+        get_authenticated :show:_path, @user, params: {id: @user.id, format: :json}
         json = JSON.parse(response.body)
 
         assert_response :success
@@ -58,7 +58,7 @@ class UsersControllerTest < ActionController::TestCase
       should "not show hidden attributes to others" do
         another = FactoryBot.create(:user)
 
-        get :show, {id: another.id, format: :json}, {user_id: @user.id}
+        get_authenticated :show:_path, @user, params: {id: another.id, format: :json}
         json = JSON.parse(response.body)
 
         assert_response :success
@@ -66,7 +66,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "strip '?' from attributes" do
-        get :show, {id: @user.id, format: :xml}, {user_id: @user.id}
+        get_authenticated :show:_path, @user, params: {id: @user.id, format: :xml}
         xml = Hash.from_xml(response.body)
 
         assert_response :success
@@ -88,7 +88,7 @@ class UsersControllerTest < ActionController::TestCase
     context "create action" do
       should "create a user" do
         assert_difference("User.count", 1) do
-          post :create, {:user => {:name => "xxx", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:user => {:name => "xxx", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}
           assert_not_nil(assigns(:user))
           assert_equal([], assigns(:user).errors.full_messages)
         end
@@ -117,7 +117,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "render" do
-        get :edit, {:id => @user.id}, {:user_id => @user.id}
+        get_authenticated :edit:_path, @user, params: {:id => @user.id}
         assert_response :success
       end
     end
@@ -128,7 +128,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "update a user" do
-        post :update, {:id => @user.id, :user => {:favorite_tags => "xyz"}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @user.id, :user => {:favorite_tags => "xyz"}}
         @user.reload
         assert_equal("xyz", @user.favorite_tags)
       end
@@ -139,7 +139,7 @@ class UsersControllerTest < ActionController::TestCase
         end
 
         should "not work" do
-          post :update, {:id => @user.id, :user => {:level => 40}}, {:user_id => @cuser.id}
+          post_authenticated :update:_path, @cuser, params: {:id => @user.id, :user => {:level => 40}}
           @user.reload
           assert_equal(20, @user.level)
         end
@@ -148,7 +148,7 @@ class UsersControllerTest < ActionController::TestCase
       context "for a banned user" do
         should "allow the user to edit their settings" do
           @user = FactoryBot.create(:banned_user)
-          post :update, {:id => @user.id, :user => {:favorite_tags => "xyz"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @user.id, :user => {:favorite_tags => "xyz"}}
 
           assert_equal("xyz", @user.reload.favorite_tags)
         end

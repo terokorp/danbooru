@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Maintenance
   module User
-    class ApiKeysControllerTest < ActionController::TestCase
+    class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       def params(password = "password")
         { :user_id => @user.id, :user => { :password => password } }
       end
@@ -21,7 +21,7 @@ module Maintenance
 
         context "#show" do
           should "render" do
-            get :show, {:user_id => @user.id}, {:user_id => @user.id}
+            get_authenticated :show:_path, @user, params: {:user_id => @user.id}
             assert_response :success
           end
         end

@@ -131,7 +131,7 @@ class Note < ApplicationRecord
   end
 
   def create_version
-    return unless versioned_attributes_changed?
+    return unless saved_change_to_versioned_attributes?
 
     if merge_version?
       merge_version
@@ -142,7 +142,7 @@ class Note < ApplicationRecord
     end
   end
 
-  def versioned_attributes_changed?
+  def saved_change_to_versioned_attributes?
     new_record? || saved_change_to_x? || saved_change_to_y? || saved_change_to_width? || saved_change_to_height? || saved_change_to_is_active? || saved_change_to_body?
   end
 

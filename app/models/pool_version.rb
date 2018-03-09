@@ -1,10 +1,8 @@
 class PoolVersion < ApplicationRecord
   class Error < Exception ; end
 
-  validates_presence_of :updater_id, :updater_ip_addr
   belongs_to :pool
-  belongs_to :updater, :class_name => "User"
-  before_validation :initialize_updater
+  belongs_to_updater
 
   module SearchMethods
     def for_user(user_id)
@@ -72,17 +70,8 @@ class PoolVersion < ApplicationRecord
     puts "last version id: #{last_version_id}"
   end
 
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
   def pretty_name
     name.tr("_", " ")
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
-    self.updater_ip_addr = CurrentUser.ip_addr
   end
 
   def post_id_array

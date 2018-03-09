@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Moderator
-  class DashboardsControllerTest < ActionController::TestCase
+  class DashboardsControllerTest < ActionDispatch::IntegrationTest
     context "The moderator dashboards controller" do
       setup do
         @admin = FactoryBot.create(:admin_user)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserNameChangeRequestsControllerTest < ActionController::TestCase
+class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
   context "The user name change requests controller" do
     setup do
       @user = FactoryBot.create(:gold_user)
@@ -24,14 +24,14 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
 
     context "create action" do
       should "work" do
-        post :create, { user_name_change_request: { desired_name: "zun" }}, { user_id: @user.id }
+        post_authenticated :create:_path, @user, params: { user_name_change_request: { desired_name: "zun" }}
         assert_response :success
       end
     end
     
     context "show action" do
       should "render" do
-        get :show, {:id => @change_request.id}, {:user_id => @user.id}
+        get_authenticated :show:_path, @user, params: {:id => @change_request.id}
         assert_response :success
       end
 
@@ -57,14 +57,14 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
       
       context "approve action" do
         should "succeed" do
-          post :approve, {:id => @change_request.id}, {:user_id => @admin.id}
+          post_authenticated :approve:_path, @admin, params: {:id => @change_request.id}
           assert_redirected_to(user_name_change_request_path(@change_request))
         end
       end
       
       context "reject action" do
         should "succeed" do
-          post :reject, {:id => @change_request.id}, {:user_id => @admin.id}
+          post_authenticated :reject:_path, @admin, params: {:id => @change_request.id}
           assert_redirected_to(user_name_change_request_path(@change_request))
         end
       end

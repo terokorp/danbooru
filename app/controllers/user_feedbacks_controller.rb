@@ -19,7 +19,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def index
-    @search = UserFeedback.visible.search(params[:search])
+    @search = UserFeedback.visible.search(search_params)
     @user_feedbacks = @search.paginate(params[:page], :limit => params[:limit])
     respond_with(@user_feedbacks) do |format|
       format.xml do

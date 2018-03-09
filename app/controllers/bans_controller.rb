@@ -12,7 +12,7 @@ class BansController < ApplicationController
   end
 
   def index
-    @bans = Ban.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @bans = Ban.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@bans) do |fmt|
       fmt.html { @bans = @bans.includes(:user, :banner) }
     end
@@ -49,10 +49,6 @@ class BansController < ApplicationController
   end
 
   private
-
-  def search_params
-    params.fetch(:search, {}).permit(%i(user_name banner_name reason_matches expired order commit))
-  end
 
   def ban_params(context)
     permitted_params = %i[reason duration expires_at]

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PostVersionsControllerTest < ActionController::TestCase
+class PostVersionsControllerTest < ActionDispatch::IntegrationTest
   def setup
     super
 
@@ -31,7 +31,7 @@ class PostVersionsControllerTest < ActionController::TestCase
       end
 
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:post_id => @post.id}}, {:user_id => @user.id}
+        get_authenticated :index:_path, @user, params: {:search => {:post_id => @post.id}}
         assert_response :success
         assert_not_nil(assigns(:post_versions))
       end

@@ -2,7 +2,7 @@ require "test_helper"
 
 module Maintenance
   module User
-    class DmailFiltersControllerTest < ActionController::TestCase
+    class DmailFiltersControllerTest < ActionDispatch::IntegrationTest
       context "The dmail filters controller" do
         setup do
           @user1 = FactoryGirl.create(:user)

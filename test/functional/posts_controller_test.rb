@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PostsControllerTest < ActionController::TestCase
+class PostsControllerTest < ActionDispatch::IntegrationTest
   context "The posts controller" do
     setup do
       @user = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
@@ -125,7 +125,7 @@ class PostsControllerTest < ActionController::TestCase
 
     context "update action" do
       should "work" do
-        post :update, {:id => @post.id, :post => {:tag_string => "bbb"}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @post.id, :post => {:tag_string => "bbb"}}
         assert_redirected_to post_path(@post)
 
         @post.reload
@@ -133,7 +133,7 @@ class PostsControllerTest < ActionController::TestCase
       end
 
       should "ignore restricted params" do
-        post :update, {:id => @post.id, :post => {:last_noted_at => 1.minute.ago}}, {:user_id => @user.id}
+        post_authenticated :update:_path, @user, params: {:id => @post.id, :post => {:last_noted_at => 1.minute.ago}}
         assert_nil(@post.reload.last_noted_at)
       end
     end
@@ -147,7 +147,7 @@ class PostsControllerTest < ActionController::TestCase
       should "work" do
         @version = @post.versions.first
         assert_equal("aaaa", @version.tags)
-        post :revert, {:id => @post.id, :version_id => @version.id}, {:user_id => @user.id}
+        post_authenticated :revert:_path, @user, params: {:id => @post.id, :version_id => @version.id}
         assert_redirected_to post_path(@post)
         @post.reload
         assert_equal("aaaa", @post.tag_string)
@@ -156,7 +156,7 @@ class PostsControllerTest < ActionController::TestCase
       should "not allow reverting to a previous version of another post" do
         @post2 = FactoryBot.create(:post, :uploader_id => @user.id, :tag_string => "herp")
 
-        post :revert, { :id => @post.id, :version_id => @post2.versions.first.id }, {:user_id => @user.id}
+        post_authenticated :revert:_path, @user, params: { :id => @post.id, :version_id => @post2.versions.first.id }
         @post.reload
 
         assert_not_equal(@post.tag_string, @post2.tag_string)

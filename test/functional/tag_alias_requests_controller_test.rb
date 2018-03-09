@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TagAliasRequestsControllerTest < ActionController::TestCase
+class TagAliasRequestsControllerTest < ActionDispatch::IntegrationTest
   context "The tag alias request controller" do
     setup do
       @user = FactoryBot.create(:user)
@@ -23,7 +23,7 @@ class TagAliasRequestsControllerTest < ActionController::TestCase
     context "create action" do
       should "render" do
         assert_difference("ForumTopic.count", 1) do
-          post :create, {:tag_alias_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc", :skip_secondary_validations => true}}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:tag_alias_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc", :skip_secondary_validations => true}}
         end
         assert_redirected_to(forum_topic_path(ForumTopic.last))
       end

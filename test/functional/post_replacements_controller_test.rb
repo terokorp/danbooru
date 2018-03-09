@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PostReplacementsControllerTest < ActionController::TestCase
+class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
   context "The post replacements controller" do
     setup do
       Delayed::Worker.delay_jobs = true # don't delete the old images right away

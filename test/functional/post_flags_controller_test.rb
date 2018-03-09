@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PostFlagsControllerTest < ActionController::TestCase
+class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
     setup do
       Timecop.travel(2.weeks.ago) do
@@ -35,7 +35,7 @@ class PostFlagsControllerTest < ActionController::TestCase
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:post_id => @post_flag.post_id}}, {:user_id => @user.id}
+          get_authenticated :index:_path, @user, params: {:search => {:post_id => @post_flag.post_id}}
           assert_response :success
         end
       end
@@ -48,7 +48,7 @@ class PostFlagsControllerTest < ActionController::TestCase
 
       should "create a new flag" do
         assert_difference("PostFlag.count", 1) do
-          post :create, {:format => "js", :post_flag => {:post_id => @post.id, :reason => "xxx"}}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:format => "js", :post_flag => {:post_id => @post.id, :reason => "xxx"}}
           assert_not_nil(assigns(:post_flag))
           assert_equal([], assigns(:post_flag).errors.full_messages)
         end

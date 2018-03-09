@@ -2,7 +2,7 @@ require "test_helper"
 
 module Maintenance
   module User
-    class DeletionsControllerTest < ActionController::TestCase
+    class DeletionsControllerTest < ActionDispatch::IntegrationTest
       context "in all cases" do
         setup do
           @user = FactoryGirl.create(:user)
@@ -19,7 +19,7 @@ module Maintenance
 
         context "#destroy" do
           should "render" do
-            post :destroy, {:password => "password"}, {:user_id => @user.id}
+            post_authenticated :destroy:_path, @user, params: {:password => "password"}
             assert_redirected_to(posts_path)
           end
         end

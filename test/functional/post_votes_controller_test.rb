@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PostVotesControllerTest < ActionController::TestCase
+class PostVotesControllerTest < ActionDispatch::IntegrationTest
   context "The post vote controller" do
     setup do
       @user = FactoryBot.create(:gold_user)
@@ -44,7 +44,7 @@ class PostVotesControllerTest < ActionController::TestCase
       end
 
       should "increment a post's score if the score is positive" do
-        post :create, {:post_id => @post.id, :score => "up", :format => "js"}, {:user_id => @user.id}
+        post_authenticated :create:_path, @user, params: {:post_id => @post.id, :score => "up", :format => "js"}
         assert_response :success
         @post.reload
         assert_equal(1, @post.score)
@@ -52,8 +52,8 @@ class PostVotesControllerTest < ActionController::TestCase
 
       context "that fails" do
         should "return a 500" do
-          post :create, {:post_id => @post.id, :score => "up", :format => "json"}, {:user_id => @user.id}
-          post :create, {:post_id => @post.id, :score => "up", :format => "json"}, {:user_id => @user.id}
+          post_authenticated :create:_path, @user, params: {:post_id => @post.id, :score => "up", :format => "json"}
+          post_authenticated :create:_path, @user, params: {:post_id => @post.id, :score => "up", :format => "json"}
           assert_equal("{\"success\": false, \"reason\": \"You have already voted for this post\"}", response.body.strip)
         end
       end
@@ -65,7 +65,7 @@ class PostVotesControllerTest < ActionController::TestCase
 
         should "fail silently on an error" do
           assert_nothing_raised do
-            post :create, {:post_id => @post.id, :score => "up", :format => "js"}, {:user_id => @user.id}
+            post_authenticated :create:_path, @user, params: {:post_id => @post.id, :score => "up", :format => "js"}
           end
         end
       end

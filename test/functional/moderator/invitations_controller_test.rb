@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Moderator
-  class InvitationsControllerTest < ActionController::TestCase
+  class InvitationsControllerTest < ActionDispatch::IntegrationTest
     context "The invitations controller" do
       setup do
         @mod = FactoryBot.create(:moderator_user)
@@ -13,12 +13,12 @@ module Moderator
       end
 
       should "render the new page" do
-        get :new, {:invitation => {:name => @user_1.name}}, {:user_id => @mod.id}
+        get_authenticated :new:_path, @mod, params: {:invitation => {:name => @user_1.name}}
         assert_response :success
       end
 
       should "create a new invite" do
-        post :create, {:invitation => {:user_id => @user_1.id, :level => User::Levels::BUILDER, :can_upload_free => "1"}}, {:user_id => @mod.id}
+        post_authenticated :create:_path, @mod, params: {:invitation => {:user_id => @user_1.id, :level => User::Levels::BUILDER, :can_upload_free => "1"}}
         assert_redirected_to(moderator_invitations_path)
         @user_1.reload
         assert_equal(User::Levels::BUILDER, @user_1.level)

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Explore
-  class PostsControllerTest < ActionController::TestCase
+  class PostsControllerTest < ActionDispatch::IntegrationTest
     context "in all cases" do
       setup do
         CurrentUser.user = FactoryBot.create(:user)

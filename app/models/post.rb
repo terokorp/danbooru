@@ -58,6 +58,7 @@ class Post < ApplicationRecord
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   serialize :keeper_data, JSON
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
   if PostArchive.enabled?
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
@@ -623,7 +624,7 @@ class Post < ApplicationRecord
     end
 
     def tag_array_was
-      @tag_array_was ||= Tag.scan_tags(tag_string_was)
+      @tag_array_was ||= Tag.scan_tags(tag_string_before_last_save)
     end
 
     def tags
@@ -705,15 +706,15 @@ class Post < ApplicationRecord
         old_parent_id = old_parent_id.to_i
       end
       if old_parent_id == parent_id
-        self.parent_id = parent_id_was
+        self.parent_id = parent_id_before_last_save
       end
 
       if old_source == source.to_s
-        self.source = source_was
+        self.source = source_before_last_save
       end
 
       if old_rating == rating
-        self.rating = rating_was
+        self.rating = rating_before_last_save
       end
     end
 
@@ -1363,7 +1364,7 @@ class Post < ApplicationRecord
       return unless saved_change_to_attribute?(:parent_id) || saved_change_to_attribute?(:is_deleted)
 
       parent.update_has_children_flag if parent.present?
-      Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
+      Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     end
 
     def give_favorites_to_parent(options = {})

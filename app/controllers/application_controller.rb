@@ -94,6 +94,13 @@ class ApplicationController < ActionController::Base
   def rescue_exception(exception)
     @exception = exception
 
+    if Rails.env.test? && ENV["DEBUG"]
+      puts "---"
+      STDERR.puts("#{exception.class} exception thrown: #{exception.message}")
+      exception.backtrace.each {|x| STDERR.puts(x)}
+      puts "---"
+    end
+
     if exception.is_a?(::ActiveRecord::StatementInvalid) && exception.to_s =~ /statement timeout/
       if Rails.env.production?
         NewRelic::Agent.notice_error(exception, :uri => request.original_url, :referer => request.referer, :request_params => params, :custom_params => {:user_id => CurrentUser.user.id, :user_ip_addr => CurrentUser.ip_addr})
@@ -212,6 +219,10 @@ class ApplicationController < ActionController::Base
         redirect_to url_for(params: params.except(:controller, :action, :index).permit!)
       end
     end
+  end
+
+  def search_params
+    params.fetch(:search, {}).permit!
   end
 
   def set_safe_mode

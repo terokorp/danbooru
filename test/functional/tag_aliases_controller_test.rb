@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TagAliasesControllerTest < ActionController::TestCase
+class TagAliasesControllerTest < ActionDispatch::IntegrationTest
   context "The tag aliases controller" do
     setup do
       @user = FactoryBot.create(:admin_user)
@@ -35,13 +35,13 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
 
         should "succeed" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}
           @tag_alias.reload
           assert_equal("xxx", @tag_alias.antecedent_name)
         end
 
         should "not allow changing the status" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:status => "active"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_alias.id, :tag_alias => {:status => "active"}}
           @tag_alias.reload
           assert_equal("pending", @tag_alias.status)
         end
@@ -56,7 +56,7 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
 
         should "fail" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          post_authenticated :update:_path, @user, params: {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}
           @tag_alias.reload
           assert_equal("aaa", @tag_alias.antecedent_name)
         end
@@ -74,7 +74,7 @@ class TagAliasesControllerTest < ActionController::TestCase
       end
 
       should "list all tag_alias (with search)" do
-        get :index, {:search => {:antecedent_name => "aaa"}}, {:user_id => @user.id}
+        get_authenticated :index:_path, @user, params: {:search => {:antecedent_name => "aaa"}}
         assert_response :success
       end
     end
@@ -86,7 +86,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
       should "destroy a tag_alias" do
         assert_difference("TagAlias.count", -1) do
-          post :destroy, {:id => @tag_alias.id}, {:user_id => @user.id}
+          post_authenticated :destroy:_path, @user, params: {:id => @tag_alias.id}
         end
       end
     end

@@ -90,7 +90,7 @@ private
   end
 
   def index_by_comment
-    @comments = Comment.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @comments = Comment.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@comments) do |format|
       format.atom do
         @comments = @comments.includes(:post, :creator).load
