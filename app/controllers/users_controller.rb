@@ -74,7 +74,7 @@ class UsersController < ApplicationController
   def cache
     @user = User.find(params[:id])
     @user.update_cache
-    render :nothing => true
+    render plain: ""
   end
 
   private

@@ -383,8 +383,8 @@ class User < ApplicationRecord
       level_string.downcase.to_sym
     end
 
-    def level_string_was
-      level_string(level_was)
+    def level_string_before_last_save
+      level_string(level_before_last_save)
     end
 
     def level_string(value = nil)
@@ -437,7 +437,7 @@ class User < ApplicationRecord
 
     def create_mod_action
       if saved_change_to_attribute?(:level)
-        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}},:user_level)
+        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_before_last_save} -> #{level_string}},:user_level)
       end
     end
 
@@ -913,6 +913,10 @@ class User < ApplicationRecord
   include CountMethods
   extend SearchMethods
   include StatisticsMethods
+
+  def as_current(&block)
+    CurrentUser.as(self, &block)
+  end
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id

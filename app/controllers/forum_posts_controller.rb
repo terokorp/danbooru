@@ -84,11 +84,11 @@ private
         end
 
         fmt.json do
-          render :nothing => true, :status => 403
+          render json: nil, :status => 403
         end
 
         fmt.xml do
-          render :nothing => true, :status => 403
+          render xml: nil, :status => 403
         end
       end
 

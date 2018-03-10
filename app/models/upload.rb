@@ -8,7 +8,7 @@ class Upload < ApplicationRecord
     :artist_commentary_desc, :include_artist_commentary,
     :referer_url, :downloaded_source, :replaced_post
   belongs_to :uploader, :class_name => "User"
-  belongs_to :post
+  belongs_to :post, optional: true
 
   before_validation :initialize_attributes
   before_create :convert_cgi_file

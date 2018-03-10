@@ -18,7 +18,7 @@ module Maintenance
     private
 
       def render_403
-        render :nothing => true, :status => 403
+        render plain: "", :status => 403
       end
 
       def validate_sig

@@ -4,6 +4,7 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
   setup do
     Timecop.travel(2.weeks.ago) do
       @user = create(:user)
+      @mod = create(:mod_user)
     end
 
     CurrentUser.as(@user) do
@@ -13,22 +14,21 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  context "GET /posts/:post_id/events" do
+  context "get /posts/:post_id/events" do
     should "render" do
-      get :index, {:post_id => @post.id}, {:user_id => CurrentUser.user.id}
+      get_authenticated post_events_path(post_id: @post.id), @user
       assert_response :ok      
     end
 
     should "render for mods" do
-      get :index, {:post_id => @post.id}, {:user_id => create(:moderator_user).id }
+      get_authenticated post_events_path(post_id: @post.id), @mod
       assert_response :success
     end
   end
 
-  context "GET /posts/:post_id/events.xml" do
+  context "get /posts/:post_id/events.xml" do
     setup do
-      get :index, {:post_id => @post.id, :format => :xml}, {:user_id => CurrentUser.user.id}
-
+      get_authenticated post_events_path(post_id: @post.id), @user, params: {:format => "xml"}
       @xml = Hash.from_xml(response.body)
       @appeal = @xml["post_events"].find { |e| e["type"] == "a" }
     end

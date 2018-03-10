@@ -1361,7 +1361,7 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_save
-      return unless saved_change_to_attribute?(:parent_id) || saved_change_to_attribute?(:is_deleted)
+      return unless saved_change_to_parent_id? || saved_change_to_is_deleted?
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
@@ -1494,9 +1494,13 @@ class Post < ApplicationRecord
 
   module VersionMethods
     def create_version(force = false)
-      if new_record? || saved_change_to_attribute?(:rating) || saved_change_to_attribute?(:source) || saved_change_to_attribute?(:parent_id) || saved_change_to_attribute?(:tag_string) || force
+      if new_record? || saved_change_to_watched_attributes? || force
         create_new_version
       end
+    end
+
+    def saved_change_to_watched_attributes?
+      saved_change_to_rating? || saved_change_to_source? || saved_change_to_parent_id? || saved_change_to_tag_string?
     end
 
     def merge_version?
@@ -1766,9 +1770,9 @@ class Post < ApplicationRecord
     end
 
     def updater_can_change_rating
-      if saved_change_to_attribute?(:rating) && is_rating_locked?
+      if saved_change_to_rating? && is_rating_locked?
         # Don't forbid changes if the rating lock was just now set in the same update.
-        if !saved_change_to_attribute?(:is_rating_locked)
+        if !saved_change_to_is_rating_locked?
           errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
         end
       end

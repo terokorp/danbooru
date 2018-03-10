@@ -167,7 +167,7 @@ class ApplicationController < ActionController::Base
         render :json => {:success => false, :reason => "access denied"}.to_json, :status => 403
       end
       fmt.js do
-        render :nothing => true, :status => 403
+        render js: "", :status => 403
       end
     end
   end

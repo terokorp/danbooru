@@ -5,12 +5,11 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
     setup do
       Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
-      @user = FactoryBot.create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-
-      @post = FactoryBot.create(:post)
-      @post_replacement = FactoryBot.create(:post_replacement, post_id: @post.id)
+      @user = create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
+      @user.as_current do
+        @post = create(:post)
+        @post_replacement = create(:post_replacement, post: @post)
+      end
     end
 
     teardown do
@@ -28,7 +27,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         }
 
         assert_difference("@post.replacements.size") do
-          post :create, params, { user_id: @user.id }
+          post_authenticated post_replacements_path, @user, params: params
           @post.reload
         end
 
@@ -54,9 +53,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           }
         }
 
-        put :update, params, { user_id: @user.id }
+        put_authenticated post_replacement_path(@post_replacement), @user, params: params
         @post_replacement.reload
-
         assert_equal(23, @post_replacement.file_size_was)
         assert_equal(42, @post_replacement.file_size)
       end
@@ -64,7 +62,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       should "render" do
-        get :index, {format: :json}
+        get post_replacements_path, params: {format: "json"}
         assert_response :success
       end
     end
