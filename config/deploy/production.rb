@@ -1,7 +1,6 @@
-set :user, "albert"
+set :user, "danbooru"
 set :rails_env, "production"
-server "sonohara.donmai.us", :roles => %w(web app db), :primary => true, :user => "albert"
-server "hijiribe.donmai.us", :roles => %w(web app), :user => "albert"
+server "localhost", :roles => %w(web app db), :primary => true, :user => "danbooru"
 
 set :linked_files, fetch(:linked_files, []).push(".env.production")
-set :rbenv_path, "/home/albert/.rbenv"
+set :rbenv_path, "/home/danbooru/.rbenv"
